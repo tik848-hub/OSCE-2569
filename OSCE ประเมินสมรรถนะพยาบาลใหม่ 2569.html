@@ -1,0 +1,1244 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="OSCE 2569">
+<title>OSCE ประเมินสมรรถนะพยาบาลใหม่ 2569</title>
+<style>
+/* ─── RESET & BASE ─────────────────────────────────────────── */
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{font-size:16px}
+body{font-family:'Sarabun',sans-serif;background:#F0F4F8;color:#1A1A2E;min-height:100vh}
+a{color:inherit;text-decoration:none}
+
+/* ─── COLORS ───────────────────────────────────────────────── */
+:root{
+  --navy:#1A3A5C;--blue:#2C5F8A;--mid:#4A7BA8;--ltBlue:#D6E8F5;--xltBlue:#EAF4FB;
+  --teal:#1A6A6A;--ltTeal:#D6EFEF;
+  --green:#1A6A40;--ltGreen:#D6EFE1;
+  --orange:#A05A00;--ltOrange:#FFF0D6;
+  --purple:#5A1A6A;--ltPurple:#EDD6EF;
+  --red:#8A1A1A;--ltRed:#F5D6D6;
+  --amber:#BA7517;--ltAmber:#FFF8D6;
+  --gray:#555;--ltGray:#F2F2F2;
+  --white:#FFFFFF;--border:#DDE3EC;
+  --shadow:0 2px 8px rgba(0,0,0,0.08);
+  --radius:10px;--radius-sm:6px;
+}
+
+/* ─── LAYOUT ────────────────────────────────────────────────── */
+.app-wrap{max-width:768px;margin:0 auto;padding:0 0 80px}
+.top-bar{background:var(--navy);color:#fff;padding:14px 16px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,0.2)}
+.top-bar h1{font-size:16px;font-weight:600;margin-bottom:2px}
+.top-bar p{font-size:12px;opacity:.75}
+
+/* ─── BOTTOM NAV ────────────────────────────────────────────── */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--border);display:flex;z-index:100;box-shadow:0 -2px 8px rgba(0,0,0,0.06)}
+.nav-btn{flex:1;padding:10px 4px 8px;border:none;background:transparent;font-family:'Sarabun',sans-serif;font-size:11px;color:var(--gray);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;transition:color 0.15s}
+.nav-btn svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.nav-btn.active{color:var(--blue);font-weight:600}
+
+/* ─── CARDS ─────────────────────────────────────────────────── */
+.card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:14px 16px;margin:12px 14px 0}
+.card-title{font-size:14px;font-weight:700;color:var(--navy);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+
+/* ─── FORM INPUTS ───────────────────────────────────────────── */
+.form-group{margin-bottom:10px}
+.form-group label{display:block;font-size:12px;color:var(--gray);margin-bottom:4px;font-weight:600}
+.form-group input,.form-group select{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:'Sarabun',sans-serif;color:#1A1A2E;background:#fff;outline:none;transition:border-color .15s}
+.form-group input:focus,.form-group select:focus{border-color:var(--blue)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+/* ─── STATION GRID ──────────────────────────────────────────── */
+.station-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:12px 14px 0}
+.st-card{background:#fff;border-radius:var(--radius-sm);border:1.5px solid var(--border);padding:8px 6px;cursor:pointer;text-align:center;transition:all .15s}
+.st-card.active{border-color:var(--blue);background:var(--xltBlue)}
+.st-card.done-pass{border-color:var(--green)}
+.st-card.done-fail{border-color:var(--red)}
+.st-card.done-critfail{border-color:var(--red);background:var(--ltRed)}
+.st-no{font-size:10px;color:var(--gray);margin-bottom:2px}
+.st-name{font-size:10px;font-weight:600;line-height:1.3;color:#1A1A2E}
+.st-badge{font-size:10px;font-weight:700;margin-top:4px;padding:2px 4px;border-radius:4px;display:inline-block}
+.badge-pass{background:var(--ltGreen);color:var(--green)}
+.badge-fail{background:var(--ltRed);color:var(--red)}
+.badge-empty{background:var(--ltGray);color:var(--gray)}
+.badge-partial{background:var(--ltAmber);color:var(--amber)}
+
+/* ─── SECTION HEADER ────────────────────────────────────────── */
+.sec-head{font-size:12px;font-weight:700;color:#fff;padding:7px 12px;border-radius:var(--radius-sm);margin:10px 0 6px}
+
+/* ─── ITEM ROW ──────────────────────────────────────────────── */
+.item-row{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid #F0F4F8}
+.item-row:last-child{border-bottom:none}
+.item-text{flex:1;font-size:13px;line-height:1.5;color:#1A1A2E}
+.crit-tag{font-size:9px;background:var(--ltRed);color:var(--red);padding:1px 5px;border-radius:3px;margin-left:4px;font-weight:700;white-space:nowrap}
+.score-group{display:flex;gap:4px;flex-shrink:0}
+.sb{width:36px;height:32px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;font-weight:700;cursor:pointer;background:#fff;color:var(--gray);font-family:'Sarabun',sans-serif;transition:all .12s;touch-action:manipulation}
+.sb:active{transform:scale(0.93)}
+.sb.s2{background:#D6EFE1;color:var(--green);border-color:var(--green)}
+.sb.s1{background:var(--ltAmber);color:var(--amber);border-color:var(--amber)}
+.sb.s0{background:var(--ltRed);color:var(--red);border-color:var(--red)}
+
+/* ─── PROGRESS ──────────────────────────────────────────────── */
+.prog-wrap{margin:8px 0}
+.prog-bar{height:8px;background:#E8EDF3;border-radius:4px;overflow:hidden}
+.prog-fill{height:100%;border-radius:4px;transition:width .3s}
+.prog-label{display:flex;justify-content:space-between;font-size:11px;color:var(--gray);margin-bottom:3px}
+
+/* ─── SUMMARY ───────────────────────────────────────────────── */
+.metric-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:10px}
+.metric-card{background:var(--xltBlue);border-radius:var(--radius-sm);padding:12px;text-align:center}
+.metric-val{font-size:22px;font-weight:700}
+.metric-lbl{font-size:11px;color:var(--gray);margin-top:2px}
+.result-badge{display:inline-block;padding:6px 18px;border-radius:20px;font-size:14px;font-weight:700;margin:6px 0}
+.rb-pass{background:var(--ltGreen);color:var(--green)}
+.rb-fail{background:var(--ltRed);color:var(--red)}
+.rb-pending{background:var(--ltAmber);color:var(--amber)}
+
+/* ─── CHART BAR ─────────────────────────────────────────────── */
+.chart-row{display:flex;align-items:center;gap:8px;padding:5px 0}
+.chart-name{font-size:11px;color:var(--gray);width:90px;flex-shrink:0;line-height:1.3}
+.chart-bar-wrap{flex:1;background:#E8EDF3;border-radius:3px;height:18px;overflow:hidden}
+.chart-bar-fill{height:100%;border-radius:3px;transition:width .4s;display:flex;align-items:center;padding-left:6px}
+.chart-pct{font-size:11px;font-weight:700;min-width:36px;text-align:right}
+.pass-tag{font-size:10px;padding:1px 6px;border-radius:3px;min-width:38px;text-align:center}
+
+/* ─── DEVELOP ───────────────────────────────────────────────── */
+.dev-item{border-left:3px solid var(--border);border-radius:0 var(--radius-sm) var(--radius-sm) 0;padding:10px 12px;margin-bottom:8px;background:var(--ltGray)}
+.dev-item.d-fail{border-left-color:var(--red);background:var(--ltRed)}
+.dev-item.d-warn{border-left-color:var(--amber);background:var(--ltAmber)}
+.dev-item.d-pass{border-left-color:var(--green);background:var(--ltGreen)}
+.dev-title{font-size:13px;font-weight:700;margin-bottom:4px}
+.dev-rec{font-size:12px;line-height:1.6;color:#333}
+
+/* ─── SUBMIT SECTION ────────────────────────────────────────── */
+.submit-card{background:linear-gradient(135deg,var(--navy),var(--blue));border-radius:var(--radius);padding:16px;margin:12px 14px 0;color:#fff}
+.submit-card h3{font-size:14px;font-weight:700;margin-bottom:4px}
+.submit-card p{font-size:12px;opacity:.85;margin-bottom:12px}
+.url-input{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:none;font-size:12px;font-family:'Sarabun',sans-serif;margin-bottom:8px;background:rgba(255,255,255,0.15);color:#fff}
+.url-input::placeholder{color:rgba(255,255,255,0.6)}
+.url-input:focus{outline:2px solid rgba(255,255,255,0.5)}
+.btn-submit{width:100%;padding:13px;border:none;border-radius:var(--radius-sm);font-size:15px;font-weight:700;font-family:'Sarabun',sans-serif;cursor:pointer;transition:all .15s}
+.btn-submit:active{transform:scale(0.98)}
+.btn-send{background:#fff;color:var(--navy)}
+.btn-send:disabled{opacity:.5;cursor:not-allowed}
+.btn-reset{background:rgba(255,255,255,0.15);color:#fff;border:1.5px solid rgba(255,255,255,0.4);margin-top:6px}
+.toast{position:fixed;top:80px;left:50%;transform:translateX(-50%);background:#1A1A2E;color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;z-index:999;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1}
+
+/* ─── TABS ──────────────────────────────────────────────────── */
+.view{display:none}
+.view.active{display:block}
+
+/* ─── LEGEND ────────────────────────────────────────────────── */
+.legend{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+.legend-item{display:flex;align-items:center;gap:4px;font-size:11px}
+.legend-dot{width:12px;height:12px;border-radius:3px;flex-shrink:0}
+
+/* ─── RADAR SVG ─────────────────────────────────────────────── */
+.radar-wrap{text-align:center}
+.radar-wrap svg{max-width:320px;width:100%}
+
+/* ─── RESPONSIVE ────────────────────────────────────────────── */
+@media(max-width:400px){
+  .station-grid{grid-template-columns:repeat(4,1fr);gap:5px}
+  .st-card{padding:6px 4px}
+  .st-name{font-size:9px}
+  .form-row{grid-template-columns:1fr}
+}
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div class="app-wrap">
+
+<!-- TOP BAR -->
+<div class="top-bar">
+  <h1>OSCE ประเมินสมรรถนะพยาบาลใหม่</h1>
+  <p>ฝ่ายการพยาบาล รพ.รามาธิบดีจักรีนฤบดินทร์ | ปีงบประมาณ 2569</p>
+</div>
+
+<!-- ═══════════════════ VIEW: ASSESS ═══════════════════ -->
+<div class="view active" id="view-assess">
+
+  <!-- Evaluee Info -->
+  <div class="card">
+    <div class="card-title">
+      <svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:var(--navy);fill:none;stroke-width:2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+      ข้อมูลผู้รับการประเมิน
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>ชื่อ-สกุล</label>
+        <input type="text" id="inp-name" placeholder="กรอกชื่อ-สกุล">
+      </div>
+      <div class="form-group">
+        <label>รหัสบุคลากร</label>
+        <input type="text" id="inp-id" placeholder="เช่น 00001">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>หน่วยงาน</label>
+      <select id="inp-unit">
+        <option value="">-- เลือกหน่วยงาน --</option>
+        <option>หอผู้ป่วยวิกฤตเด็ก</option>
+        <option>หอผู้ป่วยวิกฤตทารกแรกเกิด</option>
+        <option>หอผู้ป่วยวิกฤตและโรคหลอดเลือดสมอง</option>
+        <option>หอผู้ป่วยวิกฤตหัวใจ</option>
+        <option>ห้องผ่าตัด</option>
+        <option>ห้องคลอด</option>
+        <option>หอผู้ป่วย 5E</option>
+        <option>หอผู้ป่วย 5D</option>
+        <option>หอผู้ป่วย 5C</option>
+        <option>หอผู้ป่วย 7F</option>
+        <option>งานการพยาบาลผู้ป่วยนอก</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Legend -->
+  <div style="padding:10px 14px 0">
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:#D6EFE1;border:1px solid #1A6A40"></div><span>2 = ถูกต้องสมบูรณ์</span></div>
+      <div class="legend-item"><div class="legend-dot" style="background:#FFF0D6;border:1px solid #A05A00"></div><span>1 = ต้องกระตุ้น</span></div>
+      <div class="legend-item"><div class="legend-dot" style="background:#F5D6D6;border:1px solid #8A1A1A"></div><span>0 = ไม่ผ่าน/ไม่ปฏิบัติ</span></div>
+      <div class="legend-item"><span style="font-size:9px;background:var(--ltRed);color:var(--red);padding:1px 5px;border-radius:3px;font-weight:700">★</span><span> = Critical Step</span></div>
+    </div>
+  </div>
+
+  <!-- Station Selector -->
+  <div class="station-grid" id="station-grid"></div>
+
+  <!-- Station Form -->
+  <div class="card" id="station-form-wrap">
+    <div id="station-form"></div>
+  </div>
+
+  <!-- Total Progress -->
+  <div class="card">
+    <div class="prog-label">
+      <span style="font-weight:700;color:var(--navy)" id="lbl-total">คะแนนรวม: 0 / 272</span>
+      <span id="lbl-pct" style="font-weight:700">0%</span>
+    </div>
+    <div class="prog-bar"><div class="prog-fill" id="bar-total" style="width:0%;background:var(--green)"></div></div>
+    <div style="margin-top:8px;text-align:center" id="overall-result"></div>
+  </div>
+
+</div><!-- /view-assess -->
+
+<!-- ═══════════════════ VIEW: SUMMARY ═══════════════════ -->
+<div class="view" id="view-summary">
+  <div class="card">
+    <div class="card-title">สรุปผลการประเมิน</div>
+    <div class="metric-grid">
+      <div class="metric-card"><div class="metric-val" id="s-name" style="font-size:15px;color:var(--navy)">—</div><div class="metric-lbl">ผู้รับการประเมิน</div></div>
+      <div class="metric-card"><div class="metric-val" id="s-unit" style="font-size:15px;color:var(--navy)">—</div><div class="metric-lbl">หน่วยงาน</div></div>
+      <div class="metric-card"><div class="metric-val" id="s-total" style="color:var(--navy)">0/272</div><div class="metric-lbl">คะแนนรวม</div></div>
+      <div class="metric-card"><div class="metric-val" id="s-pct">0%</div><div class="metric-lbl">ร้อยละ</div></div>
+    </div>
+    <div style="text-align:center;margin-bottom:8px"><span class="result-badge rb-pending" id="s-result">รอประเมิน</span></div>
+    <div style="font-size:12px;color:var(--gray);text-align:center" id="s-pass-count">ผ่าน 0/8 ฐาน</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">คะแนนรายฐาน</div>
+    <div id="bar-chart"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">แผนภูมิสมรรถนะ 8 ด้าน</div>
+    <div class="radar-wrap"><svg id="radar-svg" viewBox="0 0 320 280"></svg></div>
+    <div style="display:flex;gap:12px;justify-content:center;font-size:11px;margin-top:6px">
+      <div style="display:flex;align-items:center;gap:4px"><div style="width:14px;height:3px;background:#1A6A40;border-radius:2px"></div>คะแนนที่ได้</div>
+      <div style="display:flex;align-items:center;gap:4px"><div style="width:14px;height:2px;background:#BA7517;border-radius:2px;border-top:1px dashed #BA7517"></div>เกณฑ์ 70%</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title" style="color:var(--red)">
+      <svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:var(--red);fill:none;stroke-width:2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      Critical Steps ที่ผิดพลาด
+    </div>
+    <div id="crit-fails"></div>
+  </div>
+</div><!-- /view-summary -->
+
+<!-- ═══════════════════ VIEW: DEVELOP ═══════════════════ -->
+<div class="view" id="view-develop">
+  <div class="card">
+    <div class="card-title">แผนพัฒนารายบุคคล (IDP)</div>
+    <div id="dev-plan"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">กลุ่มสมรรถนะที่ต้องเสริม</div>
+    <div id="dev-group"></div>
+  </div>
+</div><!-- /view-develop -->
+
+<!-- ═══════════════════ VIEW: SEND ═══════════════════ -->
+<div class="view" id="view-send">
+
+  <div class="submit-card">
+    <h3>ส่งผลไป Google Sheets</h3>
+    <p>วางลิงก์ Google Apps Script ที่ได้จากการ Deploy แล้วกดส่ง</p>
+    <input type="url" class="url-input" id="sheets-url"
+      placeholder="https://script.google.com/macros/s/..."
+      value="">
+    <div style="font-size:11px;opacity:.75;margin-bottom:10px">
+      💡 ตั้งค่าครั้งเดียว ระบบจะจำไว้อัตโนมัติ
+    </div>
+    <button class="btn-submit btn-send" id="btn-send" onclick="submitToSheets()">
+      ส่งผลการประเมิน
+    </button>
+    <button class="btn-submit btn-reset" onclick="confirmReset()">
+      ล้างข้อมูลเริ่มใหม่
+    </button>
+    <div id="send-status"></div>
+  </div>
+
+  <!-- Apps Script Setup Guide -->
+  <div class="card">
+    <div class="card-title">วิธีตั้งค่า Google Apps Script (ทำครั้งแรกครั้งเดียว)</div>
+
+    <div style="counter-reset:step-counter">
+
+      <div style="display:flex;gap:10px;margin-bottom:12px">
+        <div style="width:24px;height:24px;background:var(--navy);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">1</div>
+        <div>
+          <div style="font-size:13px;font-weight:700;margin-bottom:3px">สร้าง Google Sheet</div>
+          <div style="font-size:12px;color:var(--gray);line-height:1.6">ไปที่ sheets.google.com → สร้างไฟล์ใหม่ → ตั้งชื่อ "OSCE ผลประเมิน 2569" → เปลี่ยนชื่อ Sheet1 เป็น "ผลประเมิน"</div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:10px;margin-bottom:12px">
+        <div style="width:24px;height:24px;background:var(--navy);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">2</div>
+        <div>
+          <div style="font-size:13px;font-weight:700;margin-bottom:3px">เปิด Apps Script</div>
+          <div style="font-size:12px;color:var(--gray);line-height:1.6">ใน Google Sheet กด Extensions → Apps Script → ลบโค้ดเดิมออก → วางโค้ดด้านล่าง:</div>
+          <div style="background:#1A1A2E;border-radius:6px;padding:10px;margin-top:6px;font-family:monospace;font-size:10px;color:#B5D4F4;line-height:1.7;overflow-x:auto;white-space:pre" id="script-code">// ── วางโค้ดนี้ทั้งหมดใน Apps Script แทนโค้ดเดิม ──
+var SHEET_ID = ""; // ← วาง Spreadsheet ID ของคุณที่นี่
+
+function doGet(e) {
+  try {
+    var ss = SHEET_ID
+      ? SpreadsheetApp.openById(SHEET_ID)
+      : SpreadsheetApp.getActiveSpreadsheet();
+
+    var sheet = ss.getSheets()[0]; // ใช้ Sheet แรกเสมอ
+
+    // สร้าง header ถ้ายังไม่มี
+    if (sheet.getLastRow() === 0) {
+      sheet.appendRow([
+        "Timestamp","ชื่อ-สกุล","รหัสบุคลากร","หน่วยงาน",
+        "ผู้ประเมินฐาน1","ผู้ประเมินฐาน2","ผู้ประเมินฐาน3","ผู้ประเมินฐาน4",
+        "ผู้ประเมินฐาน5","ผู้ประเมินฐาน6","ผู้ประเมินฐาน7","ผู้ประเมินฐาน8",
+        "ฐาน1_Sterile","ฐาน2_Suction","ฐาน3_Injection","ฐาน4_BloodTx",
+        "ฐาน5_IVFluid","ฐาน6_PIVCann","ฐาน7_Venipuncture","ฐาน8_NGT",
+        "%ฐาน1","%ฐาน2","%ฐาน3","%ฐาน4",
+        "%ฐาน5","%ฐาน6","%ฐาน7","%ฐาน8",
+        "ผลฐาน1","ผลฐาน2","ผลฐาน3","ผลฐาน4",
+        "ผลฐาน5","ผลฐาน6","ผลฐาน7","ผลฐาน8",
+        "คะแนนรวม","%รวม","CriticalFail","ผลสรุป"
+      ]);
+      sheet.getRange(1,1,1,40)
+        .setBackground("#1A3A5C")
+        .setFontColor("#FFFFFF")
+        .setFontWeight("bold");
+    }
+
+    var p = e.parameter;
+    sheet.appendRow([
+      new Date(),
+      p.name||"", p.id||"", p.unit||"",
+      p.ev1||"", p.ev2||"", p.ev3||"", p.ev4||"",
+      p.ev5||"", p.ev6||"", p.ev7||"", p.ev8||"",
+      p.score1||"", p.score2||"", p.score3||"", p.score4||"",
+      p.score5||"", p.score6||"", p.score7||"", p.score8||"",
+      p.pct1||"", p.pct2||"", p.pct3||"", p.pct4||"",
+      p.pct5||"", p.pct6||"", p.pct7||"", p.pct8||"",
+      p.result1||"", p.result2||"", p.result3||"", p.result4||"",
+      p.result5||"", p.result6||"", p.result7||"", p.result8||"",
+      p.totalScore||"", p.totalPct||"",
+      p.critFails||"", p.overallResult||""
+    ]);
+
+    // ไฮไลต์ผลสรุป
+    var lastRow = sheet.getLastRow();
+    var cell = sheet.getRange(lastRow, 40);
+    if ((p.overallResult||"") === "ผ่านทุกฐาน") {
+      cell.setBackground("#D6EFE1").setFontColor("#1A6A40");
+    } else {
+      cell.setBackground("#F5D6D6").setFontColor("#8A1A1A");
+    }
+
+    // คืนค่า 1×1 pixel GIF โปร่งใส
+    // เพื่อให้ Image tag ใน browser โหลดได้สำเร็จ
+    var gif = "R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
+    var blob = Utilities.newBlob(
+      Utilities.base64Decode(gif), "image/gif", "p.gif");
+    return ContentService
+      .createTextOutput("")
+      .setMimeType(ContentService.MimeType.TEXT);
+
+  } catch(err) {
+    Logger.log("ERROR: " + err);
+    return ContentService
+      .createTextOutput("error")
+      .setMimeType(ContentService.MimeType.TEXT);
+  }
+}
+
+// ── ทดสอบ: กด Run เลือก testWrite ──
+function testWrite() {
+  var ss = SHEET_ID
+    ? SpreadsheetApp.openById(SHEET_ID)
+    : SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheets()[0];
+  sheet.appendRow(["TEST", new Date(), "ทดสอบ"]);
+  Logger.log("OK — Sheet: " + sheet.getName()
+    + " | แถวที่: " + sheet.getLastRow());
+}</div>
+          <button onclick="copyScript()" style="margin-top:6px;padding:6px 14px;background:var(--ltBlue);color:var(--navy);border:1px solid var(--mid);border-radius:6px;font-size:12px;cursor:pointer;font-family:'Sarabun',sans-serif;font-weight:600">คัดลอกโค้ด</button>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:10px;margin-bottom:12px">
+        <div style="width:24px;height:24px;background:var(--navy);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">3</div>
+        <div>
+          <div style="font-size:13px;font-weight:700;margin-bottom:3px">Deploy เป็น Web App</div>
+          <div style="font-size:12px;color:var(--gray);line-height:1.6">กด <strong>Deploy</strong> → <strong>New deployment</strong> → เลือก type: <strong>Web App</strong><br>
+          Execute as: <strong>Me</strong><br>
+          Who has access: <strong>Anyone</strong><br>
+          กด <strong>Deploy</strong> → Copy URL → วางในช่องด้านบน</div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:10px">
+        <div style="width:24px;height:24px;background:var(--green);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">✓</div>
+        <div>
+          <div style="font-size:13px;font-weight:700;margin-bottom:3px">พร้อมใช้งาน</div>
+          <div style="font-size:12px;color:var(--gray);line-height:1.6">กรอกคะแนนครบ 8 ฐาน → มาที่แท็บ "ส่งผล" → กดส่ง → ข้อมูลเข้า Google Sheets อัตโนมัติ ข้อมูลจะถูกจัดเก็บพร้อม Timestamp ทันที</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Looker Studio tip -->
+  <div class="card" style="border-left:4px solid var(--amber)">
+    <div class="card-title" style="color:var(--amber)">
+      <svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:var(--amber);fill:none;stroke-width:2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+      ต่อยอด: สร้าง Dashboard ด้วย Looker Studio
+    </div>
+    <div style="font-size:12px;color:var(--gray);line-height:1.7">
+      1. ไปที่ <strong>lookerstudio.google.com</strong> → Create → Report<br>
+      2. เลือก Data Source: Google Sheets → เลือกไฟล์ OSCE<br>
+      3. เพิ่ม Chart: Bar chart (คะแนนรายฐาน), Scorecard (% ผ่าน), Table (รายชื่อไม่ผ่าน)<br>
+      4. เพิ่ม Filter: หน่วยงาน, วันที่<br>
+      5. Share link ให้หัวหน้าฝ่ายดู Realtime ได้ทันที
+    </div>
+  </div>
+
+</div><!-- /view-send -->
+
+</div><!-- /app-wrap -->
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <button class="nav-btn active" id="nav-assess" onclick="showView('assess')">
+    <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+    ประเมิน
+  </button>
+  <button class="nav-btn" id="nav-summary" onclick="showView('summary')">
+    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+    สรุปผล
+  </button>
+  <button class="nav-btn" id="nav-develop" onclick="showView('develop')">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+    พัฒนา IDP
+  </button>
+  <button class="nav-btn" id="nav-send" onclick="showView('send')">
+    <svg viewBox="0 0 24 24"><path d="M22 2L11 13"/><path d="M22 2L15 22 11 13 2 9l20-7z"/></svg>
+    ส่งผล
+  </button>
+</nav>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- ═══════════════════ SCRIPT ═══════════════════ -->
+<script>
+/* ── DATA ─────────────────────────────────────────────────────── */
+const STATIONS = [
+  { name:"Sterile Technique", short:"Sterile", max:28, color:"#1A6A6A", sections:[
+    { title:"A. การเตรียมความพร้อม", items:[
+      {t:"Hand Hygiene ก่อนเริ่มหัตถการ (6 ขั้นตอน ≥20 วิ. / Alcohol gel)", crit:true},
+      {t:"ตรวจสอบวันหมดอายุอุปกรณ์ปลอดเชื้อก่อนใช้งาน"},
+      {t:"ตรวจสอบบรรจุภัณฑ์: ไม่ขาด เปียกชื้น หรือเปิดมาก่อน", crit:true},
+      {t:"เตรียมพื้นที่ Sterile field ได้เหมาะสม (ระดับเอวขึ้นไป)"},
+    ]},
+    { title:"B. การเปิดอุปกรณ์ปลอดเชื้อ", items:[
+      {t:"เปิด Sterile Package ถูกต้อง ไม่สัมผัสด้านในของบรรจุภัณฑ์", crit:true},
+      {t:"วาง Sterile item บน Field ถูกต้อง ไม่ข้ามผ่านเหนือ Field"},
+      {t:"หลีกเลี่ยงการสัมผัสพื้นผิวที่ไม่ปลอดเชื้อ"},
+    ]},
+    { title:"C. การใส่ถุงมือปลอดเชื้อ", items:[
+      {t:"เปิดบรรจุภัณฑ์ Sterile Gloves ไม่สัมผัสด้านใน"},
+      {t:"ใส่ Sterile Gloves ด้วยเทคนิคที่ถูกต้อง ไม่ปนเปื้อน", crit:true},
+      {t:"ระบุและแก้ไข Contamination ได้อย่างเหมาะสม"},
+    ]},
+    { title:"D. การรักษาหลักการปลอดเชื้อ", items:[
+      {t:"รักษาความปลอดเชื้อของอุปกรณ์และ Sterile field ตลอดการปฏิบัติ"},
+      {t:"ระบุ Contamination และแก้ไขได้ทันที", crit:true},
+      {t:"กำจัดอุปกรณ์ใช้แล้วถูกต้องตามแนวทาง IC"},
+      {t:"Hand Hygiene หลังเสร็จสิ้นหัตถการ", crit:true},
+    ]},
+  ]},
+  { name:"Oral/Nasal Suction", short:"Suction", max:34, color:"#2C5F8A", sections:[
+    { title:"A. การเตรียมและประเมินก่อนดูดเสมหะ", items:[
+      {t:"ยืนยันตัวตนผู้ป่วย 2 จุด (ชื่อ-สกุล + วันเดือนปีเกิด) คำถามปลายเปิด", crit:true},
+      {t:"ประเมินความจำเป็น: SpO₂ เสียง Crackle อัตราการหายใจ"},
+      {t:"ทำก่อนอาหาร หรือ ≥2 ชม. หลังอาหาร"},
+      {t:"สวม PPE ที่เหมาะสม (N-95 กรณี Airborne) + ล้างมือ", crit:true},
+    ]},
+    { title:"B. การเตรียมอุปกรณ์", items:[
+      {t:"เลือกขนาด Suction tube ตามวัย (ทารก 5-6 / เด็กเล็ก 6-8 / ผู้ใหญ่ 12-14)"},
+      {t:"ทดสอบเครื่อง ตั้งแรงดันตามวัย (ทารก 60-80 / ผู้ใหญ่ 100-120 mmHg)", crit:true},
+      {t:"วัดระดับความลึก: ปลายจมูก → ติ่งหู (Oro-pharynx)"},
+    ]},
+    { title:"C. การดูดเสมหะ", items:[
+      {t:"จัดท่า Head-up 30–45 องศา เอียงหน้ามาทางพยาบาล"},
+      {t:"ใส่สายถึงความลึกที่วัด ยังไม่เปิด Suction"},
+      {t:"หมุนสาย + เปิด Suction + ถอยสายช้าๆ ≤15 วินาที/ครั้ง", crit:true},
+      {t:"สังเกตลักษณะ สี กลิ่น ปริมาณเสมหะ บันทึก"},
+      {t:"ให้ผู้ป่วยพักระหว่างดูด ให้ O₂ support ระหว่างพัก"},
+      {t:"ระยะเวลารวมทั้งหมด ≤15 นาที"},
+    ]},
+    { title:"D. การดูแลหลังหัตถการ", items:[
+      {t:"แจ้งผู้ป่วย/ญาติ จัดท่าพัก"},
+      {t:"ถอด PPE ถูกต้อง ทิ้งถังติดเชื้อ Hand Hygiene 7 ขั้นตอน", crit:true},
+      {t:"ติดตามอาการ รายงานแพทย์หากผิดปกติ"},
+      {t:"เปลี่ยน CRD เมื่อเสมหะเกินครึ่งภาชนะ"},
+    ]},
+  ]},
+  { name:"Injection IM/ID/SC", short:"Injection", max:40, color:"#A05A00", sections:[
+    { title:"A. ตรวจสอบ 9 Rights", items:[
+      {t:"Right Patient: ยืนยันตัวตน 2 จุด คำถามปลายเปิด", crit:true},
+      {t:"Right Drug / Dose / Route / Time: ตรวจสอบครบจากคำสั่งแพทย์"},
+      {t:"Right Documentation: บันทึก MAR ทันทีหลังให้ยา"},
+      {t:"ล้างมือก่อนเตรียมยา", crit:true},
+    ]},
+    { title:"B. การเตรียมและอธิบายผู้ป่วย", items:[
+      {t:"อธิบายวัตถุประสงค์และวิธีฉีดยาแก่ผู้ป่วย/ญาติ"},
+      {t:"เตรียม Syringe/Needle ขนาดเหมาะสมตามชนิดการฉีด"},
+      {t:"เตรียมยาถูกต้อง ปลอดเชื้อ ตรวจสอบลักษณะยาและ Expiry"},
+    ]},
+    { title:"C. การฉีดยา IM", items:[
+      {t:"เลือกและบอกตำแหน่งฉีด (Deltoid / Ventrogluteal / Vastus lateralis)"},
+      {t:"เช็ดผิวหนัง 70% Alcohol วนออก ≥2 นิ้ว รอให้แห้ง"},
+      {t:"แทงเข็มมุม 60–90 องศา ลึกถึงชั้นกล้ามเนื้อ"},
+      {t:"Aspiration ก่อนฉีด (ยกเว้น Deltoid) — ไม่พบเลือดจึงฉีดช้าๆ", crit:true},
+    ]},
+    { title:"D. การฉีดยา SC", items:[
+      {t:"เลือกตำแหน่ง SC เหมาะสม (หน้าท้อง/ต้นแขน/ต้นขา)"},
+      {t:"แทงเข็มมุม 45–90 องศา Aspiration ก่อนฉีด"},
+      {t:"ฉีดยาช้าๆ จนหมด กดสำลีแห้งเบาๆ"},
+    ]},
+    { title:"E. การฉีดยา ID", items:[
+      {t:"แทงเข็มมุม 5–15 องศา ฉีดจนเกิดตุ่มนูน ~0.5 cm", crit:true},
+      {t:"ทำเครื่องหมายรอบตุ่ม ติดตามผลตามเวลาที่ระบุ"},
+    ]},
+    { title:"F. การดูแลหลังฉีดยา", items:[
+      {t:"ทิ้งเข็มใน Sharp Container ทันที ห้าม Recap เด็ดขาด", crit:true},
+      {t:"ล้างมือหลังหัตถการ ติดตามอาการ ≥30 นาที", crit:true},
+      {t:"บันทึก MAR: Route ตำแหน่งฉีด วันเวลา"},
+      {t:"แจ้งแพทย์หากพบอาการไม่พึงประสงค์"},
+    ]},
+  ]},
+  { name:"Blood Transfusion", short:"Blood Tx", max:40, color:"#8A1A1A", sections:[
+    { title:"A. Pre-Transfusion Check", items:[
+      {t:"Double Check พยาบาล 2 คน Independent: ชื่อ/หมู่เลือด/เลขถุง/Expiry", crit:true},
+      {t:"บันทึก AI-web Blood Transfusion ครบถ้วน + กด 'Start Transfusion'", crit:true},
+      {t:"วัด V/S ก่อนให้เลือดเป็น Baseline (Temp, HR, BP, RR)"},
+      {t:"ล้างมือ สวมถุงมือสะอาด"},
+    ]},
+    { title:"B. Bedside Verification", items:[
+      {t:"Double Check ข้างเตียง: Patient ID vs ถุงเลือด vs AI-web", crit:true},
+      {t:"อธิบายขั้นตอน แจ้งอาการแพ้ที่ต้องแจ้งพยาบาลทันที"},
+    ]},
+    { title:"C. การบริหารเลือด", items:[
+      {t:"Aseptic Non-Touch Technique ต่อ Blood Transfusion Set"},
+      {t:"บริหารผ่าน Infusion pump ปรับ Rate ตามแผนการรักษา"},
+      {t:"Lock pump — ป้องกันผู้ป่วยปรับ Rate เอง"},
+      {t:"เวลาบริหาร: เลือดแดง ≤4ชม. / Platelet ≤1ชม. / Plasma ≤2ชม."},
+    ]},
+    { title:"D. V/S Monitoring", items:[
+      {t:"เลือดแดง/Plasma: V/S ก่อน → ทุก 15นาที×4 → ทุก 30นาที×2 → ทุก 1ชม.", crit:true},
+      {t:"Platelet: V/S ก่อน → ทุก 5นาที×1 → ทุก 15นาที×1 → ทุก 30นาที×1"},
+      {t:"สังเกตอาการแพ้: ไข้ หนาวสั่น ผื่นแดง หอบ แน่นหน้าอก ปวดท้อง"},
+    ]},
+    { title:"E. การจัดการ Transfusion Reaction", items:[
+      {t:"หยุดเลือดทันที On Saline Lock วัด V/S แจ้งแพทย์", crit:true},
+      {t:"บันทึก Transfusion Reaction ใน AI-web ครบถ้วน"},
+      {t:"เก็บถุงเลือด+เซตให้เลือด (ปิด Sterile Needle) ส่งคลังเลือด"},
+      {t:"เจาะเลือด Clotted+EDTA ส่งคลังเลือด"},
+    ]},
+    { title:"F. การปิดและบันทึก", items:[
+      {t:"กด 'End Transfusion' ใน AI-web เมื่อหมดถุงและไม่มีอาการแพ้"},
+      {t:"บันทึก I&O ชนิดเลือด ปริมาณ เวลาเริ่ม-สิ้นสุด ใน Nurse Note"},
+      {t:"ถอดถุงมือ ล้างมือหลังหัตถการ"},
+    ]},
+  ]},
+  { name:"IV Fluid/Drug Admin", short:"IV Fluid", max:34, color:"#1A6A6A", sections:[
+    { title:"A. ตรวจสอบคำสั่งและเตรียมสารน้ำ", items:[
+      {t:"ตรวจสอบชนิด/ขนาด/Rate ตรงตามคำสั่งแพทย์"},
+      {t:"ตรวจ Expiry ลักษณะสารน้ำ — ห้ามใช้หากขุ่น/มีตะกอน/ถุงรั่ว", crit:true},
+      {t:"ติด Label ครบถ้วน + Double Check กับพยาบาลอีก 1 คน", crit:true},
+      {t:"ติด Label ไม่ทับชื่อสารน้ำและตัวเลขปริมาณ"},
+    ]},
+    { title:"B. การเตรียมอุปกรณ์และผู้ป่วย", items:[
+      {t:"เลือก Infusion/Syringe pump เหมาะสม เตรียมอุปกรณ์ครบ"},
+      {t:"ยืนยันตัวตนผู้ป่วย 2 จุด", crit:true},
+      {t:"อธิบายขั้นตอน แจ้งอาการที่ต้องแจ้งพยาบาล"},
+      {t:"สอบถามประวัติแพ้ยา/พลาสเตอร์"},
+      {t:"ล้างมือ สวมถุงมือ"},
+    ]},
+    { title:"C. การต่อสายและบริหาร", items:[
+      {t:"เปิด IV Set ต่อขวดสารน้ำด้วย ANTT (Aseptic Non-Touch Technique)", crit:true},
+      {t:"ตั้งค่า Pump: Rate/Volume/VTBI ถูกต้อง + Double Check ก่อนเริ่ม", crit:true},
+      {t:"Lock pump — ผู้ป่วยปรับ Rate เองไม่ได้"},
+      {t:"ตรวจสาย IV ไม่หัก งอ พับ ก่อนออกจากเตียงผู้ป่วย"},
+    ]},
+    { title:"D. ประเมิน IV Site และบันทึก", items:[
+      {t:"ประเมิน IV site ก่อนให้ยา: ไม่มี Phlebitis/Infiltration/Extravasation", crit:true},
+      {t:"พบ Phlebitis ทุกระดับ หรือ 'เจ็บเส้น' → เปลี่ยนตำแหน่งทันที"},
+      {t:"บันทึก Nurse Note ครบ: ชนิด ตำแหน่ง วัน-เวลา วันเปลี่ยน (≤96ชม.)"},
+      {t:"ถอดถุงมือ ล้างมือหลังหัตถการ"},
+    ]},
+  ]},
+  { name:"PIV Cannulation", short:"PIV Cann", max:34, color:"#5A1A6A", sections:[
+    { title:"A. การเตรียมและยืนยัน", items:[
+      {t:"ยืนยันตัวตนผู้ป่วย 2 จุด ตรวจสอบกับคำสั่งแพทย์", crit:true},
+      {t:"อธิบายขั้นตอน แจ้งอาการที่ต้องรายงาน"},
+      {t:"เตรียม Extension with T หล่อสายด้วย BD-Posiflush (ANTT)"},
+      {t:"ล้างมือ สวมถุงมือ Non-Sterile"},
+    ]},
+    { title:"B. เลือกตำแหน่งและเตรียมผิวหนัง", items:[
+      {t:"เลือก Vein เหมาะสม: Distal→Proximal, แขนไม่ถนัด, ห่างข้อพับ ≥5cm"},
+      {t:"รัด Tourniquet 10–15cm เหนือตำแหน่งแทง แบบเงื่อนกระตุก"},
+      {t:"เช็ดผิวหนัง Chlorhexidine/Alcohol วน 2–4cm รอแห้ง ห้ามสัมผัส-เป่า-โบก", crit:true},
+    ]},
+    { title:"C. การแทงเข็มและสอด Cannula", items:[
+      {t:"ตึงผิวหนังด้วยนิ้วโป้ง ดึงลง 4–5cm"},
+      {t:"แทงเข็มมุม 10–30 องศา Bevel ขึ้น ลดมุมขนานผิวหนังเมื่อเข้าเส้น"},
+      {t:"สังเกต Flashback → Advance Cannula พร้อม Withdraw Stylet", crit:true},
+      {t:"ปลด Tourniquet ก่อนถอน Stylet → ต่อ Extension with T (ANTT)"},
+    ]},
+    { title:"D. การยึดสายและทดสอบ", items:[
+      {t:"ปิด Tegaderm IV จัดสาย Extension ตัว U (Omega technique)"},
+      {t:"Flush NSS + Positive Pressure Locking — ไม่บวม ไม่แน่น", crit:true},
+      {t:"ติด Label วันที่เปิดเส้น/วันเปลี่ยน (≤96 ชม.)"},
+    ]},
+    { title:"E. การบันทึก", items:[
+      {t:"ให้ความรู้ผู้ป่วย/ญาติ: ดูแลไม่ให้หัก งอ อาการที่ต้องแจ้ง"},
+      {t:"บันทึก Nurse Note: ชนิด Cannula ขนาด ตำแหน่ง วัน-เวลา"},
+      {t:"ทิ้ง Stylet ใน Sharp Container ทันที ห้าม Recap + ล้างมือ", crit:true},
+    ]},
+  ]},
+  { name:"Venipuncture", short:"Venipunct", max:32, color:"#1A3A5C", sections:[
+    { title:"A. การเตรียมก่อนเจาะ", items:[
+      {t:"ตรวจสอบคำสั่ง Lab เตรียม Lab Form + Sticker Label ครบถ้วน"},
+      {t:"เลือกหลอดบรรจุเลือดถูกชนิดตามการตรวจ ตรวจ Expiry"},
+      {t:"ยืนยันตัวตน 2 จุด เทียบกับ Sticker Label (คำถามปลายเปิด)", crit:true},
+      {t:"ล้างมือ สวมถุงมือ"},
+    ]},
+    { title:"B. เลือกตำแหน่งและเตรียมผิวหนัง", items:[
+      {t:"เลือก Vein เหมาะสม (Median Cubital / Cephalic vein)"},
+      {t:"รัด Tourniquet เหนือข้อพับ ~2 นิ้ว แบบเงื่อนกระตุก ≤1 นาที"},
+      {t:"เช็ดผิวหนัง Alcohol รอแห้ง 30 วินาที ห้ามสัมผัส-เป่า-โบก", crit:true},
+    ]},
+    { title:"C. การเจาะและเก็บเลือด", items:[
+      {t:"แทงเข็มมุม 15–30 องศา Bevel ขึ้น สังเกต Flashback"},
+      {t:"คลาย Tourniquet ก่อนถอดเข็ม/ก่อนดูดเลือดสุดลูกสูบ", crit:true},
+      {t:"เติมเลือดตาม Order of Draw: SST → EDTA → Citrate → อื่นๆ"},
+      {t:"กลับหลอดตามจำนวนที่กำหนด ห้ามเขย่า"},
+      {t:"กดสำลีแห้ง 2–5 นาที จนเลือดหยุดสนิท"},
+    ]},
+    { title:"D. การจัดการหลังเจาะ", items:[
+      {t:"ทิ้งเข็มใน Sharp Container ทันที ห้าม Recap เด็ดขาด", crit:true},
+      {t:"ติด Sticker Label บนหลอดเลือดทุกหลอดก่อนส่ง Lab"},
+      {t:"ใส่ซองพลาสติก ส่งตรวจ/จัดเก็บถูกต้องตามประเภทการตรวจ"},
+      {t:"ถอดถุงมือ ล้างมือหลังหัตถการ"},
+    ]},
+  ]},
+  { name:"NGT Insertion", short:"NGT", max:36, color:"#1A6A40", sections:[
+    { title:"A. การเตรียมและประเมิน", items:[
+      {t:"ยืนยันตัวตนผู้ป่วย 2 จุด คำถามปลายเปิด", crit:true},
+      {t:"อธิบายความจำเป็นและขั้นตอนแก่ผู้ป่วย/ญาติ"},
+      {t:"ประเมินช่องจมูก: เลือกรูที่อากาศผ่านได้ดี ไม่มีสิ่งอุดตัน"},
+      {t:"ล้างมือ สวมถุงมือสะอาด"},
+    ]},
+    { title:"B. เลือกขนาดสายและวัดความยาว", items:[
+      {t:"เลือกขนาด NGT ตามวัย (ทารก 5-6Fr / เด็กเล็ก 6-8Fr / ผู้ใหญ่ 12-16Fr)"},
+      {t:"วัดความยาว: ปลายจมูก → ติ่งหู → Xiphoid Process ทำสัญลักษณ์", crit:true},
+      {t:"หล่อลื่นปลายสาย 10–20 cm ด้วย K-Y Gel"},
+    ]},
+    { title:"C. การใส่สาย", items:[
+      {t:"จัดท่า Head-up 30–45 องศา (Fowler's Position)"},
+      {t:"แหงนหน้าเล็กน้อย ใส่สายเข้าจมูกช้าๆ ตามโพรงจมูก"},
+      {t:"ถึงคอ: ก้มหน้า ให้กลืนน้ำลาย ดันสายตามจังหวะกลืนนุ่มนวล"},
+      {t:"หากไอ ขย้อน เขียว หายใจลำบาก → ดึงสายออกทันที", crit:true},
+    ]},
+    { title:"D. การยืนยันตำแหน่ง (Verification)", items:[
+      {t:"วิธี 1: ดูด — ได้น้ำย่อยจากกระเพาะ", crit:true},
+      {t:"วิธี 2: ดันลม 5–10ml ฟัง Borborygmi ด้วย Stethoscope ดูดลมออกหลัง", crit:true},
+      {t:"X-ray ยืนยัน กรณีสงสัยหรือตามแนวทางหน่วยงาน"},
+    ]},
+    { title:"E. การยึดสายและดูแลต่อเนื่อง", items:[
+      {t:"ยึดสายด้วย Transpore ที่สันจมูก มั่นคง สบาย ไม่กดทับ"},
+      {t:"Head-up ≥30 องศาตลอดขณะให้อาหาร + ≥30 นาทีหลังให้เสร็จ"},
+      {t:"บันทึก: ขนาดสาย ความยาว รูจมูก วิธียืนยัน วันที่ใส่"},
+      {t:"แจ้งผู้ป่วย/ญาติ ห้ามดึงสาย แจ้งพยาบาลหาก Tube หลุด เปลี่ยนทุก 1 เดือน"},
+    ]},
+  ]},
+];
+
+const RECS = [
+  ["ฝึก Sterile Technique ซ้ำ ≥3 ครั้ง เน้น Contamination Detection กับพยาบาลพี่เลี้ยง","ทบทวน Package Opening + Glove Donning ผ่าน Video"],
+  ["ฝึก Suction ใน Simulation เน้นตั้งแรงดันและ Timing ≤15 วินาที ทบทวน PPE","ทบทวน Suction timing + สังเกตอาการผู้ป่วยระหว่างดูด"],
+  ["ฝึก 9 Rights กับกรณีศึกษายาสูง เน้น Aspiration IM + ID Wheal","ทบทวนตำแหน่งฉีดและ Aspiration technique"],
+  ["ทบทวน AI-web workflow ฝึก Double Check + ซักซ้อม Reaction Protocol","ทบทวน V/S monitoring frequency + Reaction signs"],
+  ["ฝึก Label preparation + Double Check กับพยาบาลพี่เลี้ยง ทบทวน Pump programming","เน้น ANTT ต่อ IV Set + ประเมิน Phlebitis ทุกเวร"],
+  ["ฝึก PIV บน Phantom Arm ≥5 ครั้ง เน้น Aseptic site prep + Flashback","ทบทวน Tourniquet release + Positive Pressure Locking"],
+  ["ฝึก Venipuncture บน Phantom ≥5 ครั้ง ทบทวน Order of Draw","ทบทวน Order of Draw + การคลาย Tourniquet"],
+  ["ฝึก NGT ใน Manikin ≥3 ครั้ง เน้น Length measurement + Verification 2 วิธี","ทบทวน Tube verification ก่อนให้อาหารทุกครั้ง"],
+];
+
+/* ── STATE ──────────────────────────────────────────────────────── */
+let scores = STATIONS.map(s => {
+  let n = s.sections.reduce((a, sec) => a + sec.items.length, 0);
+  return Array(n).fill(null);
+});
+let currentStation = 0;
+let currentView = 'assess';
+let sheetsUrl = localStorage.getItem('osce_sheets_url') || '';
+let evaluators = Array(8).fill('');
+
+/* ── INIT ───────────────────────────────────────────────────────── */
+window.addEventListener('load', () => {
+  document.getElementById('sheets-url').value = sheetsUrl;
+  buildStationGrid();
+  renderForm();
+  updateAll();
+});
+
+document.getElementById('sheets-url').addEventListener('change', e => {
+  sheetsUrl = e.target.value.trim();
+  localStorage.setItem('osce_sheets_url', sheetsUrl);
+});
+
+/* ── NAVIGATION ─────────────────────────────────────────────────── */
+function showView(v) {
+  currentView = v;
+  document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
+  document.getElementById('view-' + v).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+  document.getElementById('nav-' + v).classList.add('active');
+  if (v === 'summary') renderSummary();
+  if (v === 'develop') renderDevelop();
+}
+
+/* ── STATION GRID ───────────────────────────────────────────────── */
+function buildStationGrid() {
+  const grid = document.getElementById('station-grid');
+  grid.innerHTML = '';
+  STATIONS.forEach((s, i) => {
+    const d = document.createElement('div');
+    d.className = 'st-card' + (i === 0 ? ' active' : '');
+    d.id = 'sc-' + i;
+    d.onclick = () => selectStation(i);
+    d.innerHTML = `<div class="st-no">ฐาน ${i+1}</div><div class="st-name">${s.short}</div><div id="ss-${i}"><span class="st-badge badge-empty">—</span></div>`;
+    grid.appendChild(d);
+  });
+}
+
+function selectStation(idx) {
+  currentStation = idx;
+  document.querySelectorAll('.st-card').forEach((c, i) => {
+    c.classList.toggle('active', i === idx);
+  });
+  renderForm();
+}
+
+/* ── FORM ───────────────────────────────────────────────────────── */
+function renderForm() {
+  const s = STATIONS[currentStation];
+  const wrap = document.getElementById('station-form');
+  const maxScore = s.max;
+  const passingScore = Math.ceil(maxScore * 0.7);
+  let html = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+    <div style="font-size:14px;font-weight:700;color:var(--navy)">${s.name}</div>
+    <div style="font-size:11px;color:var(--gray)">เต็ม ${maxScore} | ผ่าน ≥${passingScore}</div>
+  </div>`;
+
+  let gi = 0;
+  s.sections.forEach(sec => {
+    html += `<div class="sec-head" style="background:${s.color}">${sec.title}</div>`;
+    sec.items.forEach(item => {
+      const curGi = gi;
+      const v = scores[currentStation][curGi];
+      const critTag = item.crit ? '<span class="crit-tag">★ Critical</span>' : '';
+      html += `<div class="item-row">
+        <div class="item-text">${item.t}${critTag}</div>
+        <div class="score-group">
+          <button class="sb${v===2?' s2':''}" onclick="setScore(${currentStation},${curGi},2)">2</button>
+          <button class="sb${v===1?' s1':''}" onclick="setScore(${currentStation},${curGi},1)">1</button>
+          <button class="sb${v===0?' s0':''}" onclick="setScore(${currentStation},${curGi},0)">0</button>
+        </div>
+      </div>`;
+      gi++;
+    });
+  });
+
+  const sc = stationScore(currentStation);
+  const pct = Math.round(sc / maxScore * 100);
+  const filled = scores[currentStation].filter(v => v !== null).length;
+  const total = scores[currentStation].length;
+  const evVal = evaluators[currentStation] || '';
+  html += `<div style="margin-top:12px;padding-top:10px;border-top:1px solid #F0F4F8">
+    <label style="font-size:12px;font-weight:700;color:var(--gray);display:block;margin-bottom:4px">ผู้ประเมินฐานนี้</label>
+    <input type="text" id="inp-ev-station"
+      value="${evVal.replace(/"/g,'&quot;')}"
+      placeholder="ชื่อพยาบาลพี่เลี้ยง/ผู้ประเมิน"
+      oninput="evaluators[${currentStation}]=this.value"
+      style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;font-family:'Sarabun',sans-serif;color:#1A1A2E;background:#fff;outline:none">
+  </div>`;
+  html += `<div class="prog-wrap">
+    <div class="prog-label"><span>${sc}/${maxScore} คะแนน (${pct}%)</span><span>${filled}/${total} ข้อ</span></div>
+    <div class="prog-bar"><div class="prog-fill" style="width:${pct}%;background:${pct>=70?'var(--green)':pct>=50?'var(--amber)':'var(--red)'}"></div></div>
+  </div>`;
+
+  wrap.innerHTML = html;
+}
+
+/* ── SCORING ─────────────────────────────────────────────────────── */
+function setScore(stIdx, gi, val) {
+  scores[stIdx][gi] = val;
+  if (stIdx === currentStation) renderForm();
+  updateAll();
+}
+
+function stationScore(i) {
+  return scores[i].reduce((a, v) => a + (v || 0), 0);
+}
+
+function stationAnswered(i) {
+  return scores[i].every(v => v !== null);
+}
+
+function hasCritFail(i) {
+  let gi = 0;
+  for (const sec of STATIONS[i].sections) {
+    for (const item of sec.items) {
+      if (item.crit && scores[i][gi] === 0) return true;
+      gi++;
+    }
+  }
+  return false;
+}
+
+function stationPassed(i) {
+  if (!stationAnswered(i)) return null;
+  if (hasCritFail(i)) return false;
+  return stationScore(i) >= Math.ceil(STATIONS[i].max * 0.7);
+}
+
+function getCritFails() {
+  const fails = [];
+  STATIONS.forEach((s, stIdx) => {
+    let gi = 0;
+    s.sections.forEach(sec => sec.items.forEach(item => {
+      if (item.crit && scores[stIdx][gi] === 0)
+        fails.push(`ฐาน${stIdx+1} ${s.short}: ${item.t.substring(0, 40)}...`);
+      gi++;
+    }));
+  });
+  return fails.join(' | ');
+}
+
+function totalScore() {
+  return STATIONS.reduce((a, _, i) => a + stationScore(i), 0);
+}
+
+function totalMax() {
+  return STATIONS.reduce((a, s) => a + s.max, 0);
+}
+
+function totalPct() {
+  return Math.round(totalScore() / totalMax() * 100);
+}
+
+function overallResult() {
+  const passCount = STATIONS.filter((_, i) => stationPassed(i) === true).length;
+  const allDone = STATIONS.every((_, i) => stationAnswered(i));
+  if (!allDone) return 'ยังไม่ครบ';
+  return passCount === 8 ? 'ผ่านทุกฐาน' : `ต้องสอบซ้ำ ${8-passCount} ฐาน`;
+}
+
+/* ── UPDATE ALL ─────────────────────────────────────────────────── */
+function updateAll() {
+  const total = totalScore();
+  const max = totalMax();
+  const pct = totalPct();
+
+  document.getElementById('lbl-total').textContent = `คะแนนรวม: ${total} / ${max}`;
+  document.getElementById('lbl-pct').textContent = pct + '%';
+  const bar = document.getElementById('bar-total');
+  bar.style.width = pct + '%';
+  bar.style.background = pct >= 70 ? 'var(--green)' : pct >= 50 ? 'var(--amber)' : 'var(--red)';
+
+  const passCount = STATIONS.filter((_, i) => stationPassed(i) === true).length;
+  const allDone = STATIONS.every((_, i) => stationAnswered(i));
+  const overallDiv = document.getElementById('overall-result');
+  if (allDone) {
+    const pass = passCount === 8;
+    overallDiv.innerHTML = `<span class="result-badge ${pass?'rb-pass':'rb-fail'}">${pass ? '✓ ผ่านทุกฐาน' : '✗ ต้องสอบซ้ำ ' + (8-passCount) + ' ฐาน'}</span>`;
+  } else {
+    const filled = STATIONS.reduce((a,_,i) => a + scores[i].filter(v=>v!==null).length, 0);
+    const allItems = STATIONS.reduce((a,s) => a + s.sections.reduce((b,sec)=>b+sec.items.length,0), 0);
+    overallDiv.innerHTML = `<span style="font-size:12px;color:var(--gray)">กรอกแล้ว ${filled}/${allItems} รายการ</span>`;
+  }
+
+  STATIONS.forEach((s, i) => {
+    const sc = stationScore(i);
+    const pct2 = Math.round(sc / s.max * 100);
+    const p = stationPassed(i);
+    const el = document.getElementById('ss-' + i);
+    const card = document.getElementById('sc-' + i);
+    if (p === true) {
+      el.innerHTML = `<span class="st-badge badge-pass">${pct2}%</span>`;
+      card.classList.add('done-pass'); card.classList.remove('done-fail','done-critfail');
+    } else if (p === false) {
+      const critfail = hasCritFail(i);
+      el.innerHTML = `<span class="st-badge badge-fail">${pct2}%</span>`;
+      card.classList.remove('done-pass');
+      if (critfail) { card.classList.add('done-critfail'); card.classList.remove('done-fail'); }
+      else { card.classList.add('done-fail'); card.classList.remove('done-critfail'); }
+    } else {
+      const partial = scores[i].some(v => v !== null);
+      el.innerHTML = `<span class="st-badge ${partial?'badge-partial':'badge-empty'}">${partial ? pct2+'%' : '—'}</span>`;
+      card.classList.remove('done-pass','done-fail','done-critfail');
+    }
+  });
+}
+
+/* ── SUMMARY ─────────────────────────────────────────────────────── */
+function renderSummary() {
+  const name = document.getElementById('inp-name').value || '—';
+  const unit = document.getElementById('inp-unit').value || '—';
+  const total = totalScore();
+  const max = totalMax();
+  const pct = totalPct();
+  const passCount = STATIONS.filter((_, i) => stationPassed(i) === true).length;
+  const allDone = STATIONS.every((_, i) => stationAnswered(i));
+
+  document.getElementById('s-name').textContent = name;
+  document.getElementById('s-unit').textContent = unit;
+  document.getElementById('s-total').textContent = `${total}/${max}`;
+  document.getElementById('s-pct').textContent = pct + '%';
+  document.getElementById('s-pct').style.color = pct >= 70 ? 'var(--green)' : pct >= 50 ? 'var(--amber)' : 'var(--red)';
+  document.getElementById('s-pass-count').textContent = `ผ่าน ${passCount}/8 ฐาน`;
+
+  const res = document.getElementById('s-result');
+  if (!allDone) { res.className='result-badge rb-pending'; res.textContent='ยังประเมินไม่ครบ'; }
+  else if (passCount === 8) { res.className='result-badge rb-pass'; res.textContent='✓ ผ่านทุกฐาน'; }
+  else { res.className='result-badge rb-fail'; res.textContent=`✗ ต้องสอบซ้ำ ${8-passCount} ฐาน`; }
+
+  // Bar chart
+  const bc = document.getElementById('bar-chart');
+  bc.innerHTML = '';
+  STATIONS.forEach((s, i) => {
+    const sc = stationScore(i);
+    const pct2 = Math.round(sc / s.max * 100);
+    const p = stationPassed(i);
+    const color = pct2 >= 70 ? '#1A6A40' : pct2 >= 50 ? '#BA7517' : '#8A1A1A';
+    const tag = p===true ? `<span class="pass-tag" style="background:#D6EFE1;color:#1A6A40">ผ่าน</span>` :
+                p===false ? `<span class="pass-tag" style="background:#F5D6D6;color:#8A1A1A">ไม่ผ่าน</span>` :
+                `<span class="pass-tag" style="background:#F0F4F8;color:#555">—</span>`;
+    const row = document.createElement('div');
+    row.className = 'chart-row';
+    row.innerHTML = `<div class="chart-name">${s.short}</div>
+      <div class="chart-bar-wrap"><div class="chart-bar-fill" style="width:${pct2}%;background:${color}"></div></div>
+      <div class="chart-pct" style="color:${color}">${pct2}%</div>
+      ${tag}`;
+    bc.appendChild(row);
+  });
+
+  // Radar
+  drawRadar();
+
+  // Crit fails
+  const cf = document.getElementById('crit-fails');
+  cf.innerHTML = '';
+  let any = false;
+  STATIONS.forEach((s, stIdx) => {
+    let gi = 0, fails = [];
+    s.sections.forEach(sec => sec.items.forEach(item => {
+      if (item.crit && scores[stIdx][gi] === 0) fails.push(item.t);
+      gi++;
+    }));
+    if (fails.length) {
+      any = true;
+      const d = document.createElement('div');
+      d.style.cssText = 'background:var(--ltRed);border-radius:6px;padding:8px 10px;margin-bottom:6px';
+      d.innerHTML = `<div style="font-size:12px;font-weight:700;color:var(--red);margin-bottom:4px">ฐาน${stIdx+1}: ${s.name}</div>` +
+        fails.map(f => `<div style="font-size:11px;color:var(--red);margin-bottom:2px">★ ${f}</div>`).join('');
+      cf.appendChild(d);
+    }
+  });
+  if (!any) cf.innerHTML = '<div style="font-size:12px;color:var(--green);padding:4px 0">✓ ไม่พบการผิดพลาด Critical Steps</div>';
+}
+
+function drawRadar() {
+  const svg = document.getElementById('radar-svg');
+  svg.innerHTML = '';
+  const cx=160, cy=140, r=100, N=8;
+  const labels = STATIONS.map(s => s.short);
+  const vals = STATIONS.map((s, i) => stationScore(i) / s.max);
+
+  for (let ring = 1; ring <= 4; ring++) {
+    let d = '';
+    for (let i = 0; i < N; i++) {
+      const a = (i/N)*Math.PI*2 - Math.PI/2;
+      const rv = r*ring/4;
+      d += (i===0?'M':'L') + (cx+rv*Math.cos(a)).toFixed(1)+','+(cy+rv*Math.sin(a)).toFixed(1);
+    }
+    const path = document.createElementNS('http://www.w3.org/2000/svg','path');
+    path.setAttribute('d',d+'Z'); path.setAttribute('fill','none');
+    path.setAttribute('stroke','#DDE3EC'); path.setAttribute('stroke-width','0.8');
+    svg.appendChild(path);
+  }
+
+  for (let i = 0; i < N; i++) {
+    const a = (i/N)*Math.PI*2 - Math.PI/2;
+    const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+    line.setAttribute('x1',cx); line.setAttribute('y1',cy);
+    line.setAttribute('x2',(cx+r*Math.cos(a)).toFixed(1)); line.setAttribute('y2',(cy+r*Math.sin(a)).toFixed(1));
+    line.setAttribute('stroke','#DDE3EC'); line.setAttribute('stroke-width','0.8');
+    svg.appendChild(line);
+    const lx=cx+(r+28)*Math.cos(a), ly=cy+(r+28)*Math.sin(a);
+    const text=document.createElementNS('http://www.w3.org/2000/svg','text');
+    text.setAttribute('x',lx.toFixed(1)); text.setAttribute('y',ly.toFixed(1));
+    text.setAttribute('text-anchor','middle'); text.setAttribute('dominant-baseline','middle');
+    text.setAttribute('font-size','10'); text.setAttribute('fill','#666');
+    text.setAttribute('font-family','Sarabun,sans-serif');
+    text.textContent=labels[i]; svg.appendChild(text);
+  }
+
+  let p70 = '';
+  for (let i = 0; i < N; i++) {
+    const a = (i/N)*Math.PI*2 - Math.PI/2;
+    p70 += (i===0?'M':'L')+(cx+r*0.7*Math.cos(a)).toFixed(1)+','+(cy+r*0.7*Math.sin(a)).toFixed(1);
+  }
+  const poly70 = document.createElementNS('http://www.w3.org/2000/svg','path');
+  poly70.setAttribute('d',p70+'Z'); poly70.setAttribute('fill','none');
+  poly70.setAttribute('stroke','#BA7517'); poly70.setAttribute('stroke-width','1');
+  poly70.setAttribute('stroke-dasharray','4,3'); svg.appendChild(poly70);
+
+  let dp = '';
+  vals.forEach((v, i) => {
+    const a = (i/N)*Math.PI*2 - Math.PI/2;
+    const rv = r*v;
+    dp += (i===0?'M':'L')+(cx+rv*Math.cos(a)).toFixed(1)+','+(cy+rv*Math.sin(a)).toFixed(1);
+  });
+  const dataPoly = document.createElementNS('http://www.w3.org/2000/svg','path');
+  dataPoly.setAttribute('d',dp+'Z');
+  dataPoly.setAttribute('fill','rgba(26,106,64,0.15)');
+  dataPoly.setAttribute('stroke','#1A6A40'); dataPoly.setAttribute('stroke-width','2');
+  svg.appendChild(dataPoly);
+
+  vals.forEach((v, i) => {
+    const a = (i/N)*Math.PI*2 - Math.PI/2;
+    const rv = r*v;
+    const dot = document.createElementNS('http://www.w3.org/2000/svg','circle');
+    dot.setAttribute('cx',(cx+rv*Math.cos(a)).toFixed(1));
+    dot.setAttribute('cy',(cy+rv*Math.sin(a)).toFixed(1));
+    dot.setAttribute('r','3.5'); dot.setAttribute('fill','#1A6A40');
+    svg.appendChild(dot);
+  });
+}
+
+/* ── DEVELOP ─────────────────────────────────────────────────────── */
+function renderDevelop() {
+  const devPlan = document.getElementById('dev-plan');
+  const devGroup = document.getElementById('dev-group');
+
+  const weak=[], med=[], str=[];
+  STATIONS.forEach((s, i) => {
+    const pct = Math.round(stationScore(i)/s.max*100);
+    if (pct < 70) weak.push({i, pct, s});
+    else if (pct < 85) med.push({i, pct, s});
+    else str.push({i, pct, s});
+  });
+
+  let html = '';
+  if (weak.length) {
+    html += `<div style="font-size:12px;font-weight:700;color:var(--red);margin-bottom:8px">ต้องพัฒนาด่วน (< 70%)</div>`;
+    weak.forEach(({i,pct,s}) => {
+      html += `<div class="dev-item d-fail">
+        <div class="dev-title" style="color:var(--red)">ฐาน${i+1}: ${s.name} — ${pct}%</div>
+        <div class="dev-rec">${RECS[i][0]}</div>
+      </div>`;
+    });
+  }
+  if (med.length) {
+    html += `<div style="font-size:12px;font-weight:700;color:var(--amber);margin:12px 0 8px">ควรเสริมสร้าง (70–84%)</div>`;
+    med.forEach(({i,pct,s}) => {
+      html += `<div class="dev-item d-warn">
+        <div class="dev-title" style="color:var(--amber)">ฐาน${i+1}: ${s.name} — ${pct}%</div>
+        <div class="dev-rec">${RECS[i][1]}</div>
+      </div>`;
+    });
+  }
+  if (str.length) {
+    html += `<div style="font-size:12px;font-weight:700;color:var(--green);margin:12px 0 8px">จุดแข็ง (≥ 85%)</div>`;
+    str.forEach(({i,pct,s}) => {
+      html += `<div class="dev-item d-pass">
+        <div class="dev-title" style="color:var(--green)">ฐาน${i+1}: ${s.name} — ${pct}%</div>
+      </div>`;
+    });
+  }
+  if (!weak.length && !med.length && !str.length) {
+    html = '<div style="font-size:12px;color:var(--gray);text-align:center;padding:20px 0">กรุณาประเมินเพื่อดูแผนพัฒนา</div>';
+  }
+  devPlan.innerHTML = html;
+
+  const groups = [
+    {label:'ป้องกันการติดเชื้อ (IC)', sts:[0,1], color:'#1A6A6A', tip:'Hand Hygiene, Sterile Technique, PPE, Aseptic'},
+    {label:'บริหารยาและสารน้ำ', sts:[2,3,4], color:'#A05A00', tip:'9 Rights, Double Check, Pump, Blood Transfusion'},
+    {label:'ทักษะหลอดเลือดดำ', sts:[5,6], color:'#5A1A6A', tip:'PIV Cannulation, Venipuncture, Flashback'},
+    {label:'ทางเดินหายใจและระบบทางเดินอาหาร', sts:[1,7], color:'#1A6A40', tip:'Suction, NGT, Verification'},
+  ];
+  let ghtml = '';
+  groups.forEach(({label,sts,color,tip}) => {
+    const avg = Math.round(sts.reduce((a,i)=>a+Math.round(stationScore(i)/STATIONS[i].max*100),0)/sts.length);
+    const tc = avg>=70?'var(--green)':avg>=50?'var(--amber)':'var(--red)';
+    ghtml += `<div style="border-left:3px solid ${color};padding:10px 12px;margin-bottom:8px;background:#F8F9FC;border-radius:0 6px 6px 0">
+      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+        <div style="font-size:13px;font-weight:700">${label}</div>
+        <div style="font-size:12px;font-weight:700;color:${tc}">${avg}%</div>
+      </div>
+      <div style="font-size:11px;color:var(--gray)">${tip}</div>
+    </div>`;
+  });
+  devGroup.innerHTML = ghtml;
+}
+
+/* ── SUBMIT TO SHEETS ────────────────────────────────────────────── */
+function submitToSheets() {
+  const url = document.getElementById('sheets-url').value.trim();
+  const name = document.getElementById('inp-name').value.trim();
+  const id = document.getElementById('inp-id').value.trim();
+  const unit = document.getElementById('inp-unit').value;
+
+  if (!url) { showToast('กรุณาใส่ URL ของ Google Apps Script'); return; }
+  if (!name) { showToast('กรุณากรอกชื่อ-สกุลผู้รับการประเมิน'); return; }
+  if (!id) { showToast('กรุณากรอกรหัสบุคลากร'); return; }
+
+  const allDone = STATIONS.every((_, i) => stationAnswered(i));
+  if (!allDone) {
+    const unanswered = STATIONS.filter((_, i) => !stationAnswered(i)).map((_, i) => `ฐาน${i+1}`);
+    showToast('ยังไม่ครบ: ' + unanswered.join(', '));
+    return;
+  }
+
+  const btn = document.getElementById('btn-send');
+  btn.disabled = true;
+  btn.textContent = 'กำลังส่ง...';
+
+  // สร้าง URL พร้อม parameters
+  const params = new URLSearchParams({
+    name, id, unit,
+    totalScore: totalScore(),
+    totalPct: totalPct(),
+    critFails: getCritFails(),
+    overallResult: overallResult(),
+  });
+  evaluators.forEach((e, i) => params.set('ev' + (i+1), e || '—'));
+  STATIONS.forEach((s, i) => {
+    params.set('score' + (i+1), stationScore(i));
+    params.set('pct' + (i+1), Math.round(stationScore(i) / s.max * 100));
+    const p = stationPassed(i);
+    params.set('result' + (i+1), p === true ? 'ผ่าน' : p === false ? 'ไม่ผ่าน' : 'ไม่ครบ');
+  });
+
+  const fullUrl = url + '?' + params.toString();
+
+  // ── วิธี Image tag: bypass CORS 100% ──
+  // Google Apps Script redirect doGet → browser โหลดเหมือน image
+  const img = new Image();
+  img.onload = img.onerror = () => {
+    // ไม่ว่าจะ load หรือ error ก็ถือว่าส่งถึง script แล้ว
+    localStorage.setItem('osce_sheets_url', url);
+    btn.disabled = false;
+    btn.textContent = 'ส่งผลการประเมิน';
+    showToast('ส่งข้อมูลแล้ว — กรุณาตรวจสอบใน Google Sheets');
+    document.getElementById('send-status').innerHTML =
+      `<div style="background:#D6EFE1;color:#1A6A40;border-radius:8px;padding:10px 14px;
+        font-size:13px;font-weight:700;margin-top:8px;text-align:center">
+        ✓ ส่งข้อมูลเรียบร้อย<br>
+        <span style="font-size:11px;font-weight:400">
+          ${name} | ${unit} | ${new Date().toLocaleString('th-TH')}
+        </span><br>
+        <span style="font-size:11px;font-weight:400;color:#555">
+          กรุณาตรวจสอบว่าข้อมูลเข้า Google Sheets แล้ว
+        </span>
+      </div>`;
+  };
+  img.src = fullUrl;
+}
+
+/* ── UTILITIES ───────────────────────────────────────────────────── */
+function confirmReset() {
+  if (confirm('ยืนยันล้างข้อมูลทั้งหมด? การกระทำนี้ไม่สามารถย้อนกลับได้')) resetAll();
+}
+
+function resetAll() {
+  scores = STATIONS.map(s => {
+    const n = s.sections.reduce((a, sec) => a + sec.items.length, 0);
+    return Array(n).fill(null);
+  });
+  evaluators = Array(8).fill('');
+  document.getElementById('inp-name').value = '';
+  document.getElementById('inp-id').value = '';
+  document.getElementById('inp-unit').value = '';
+  buildStationGrid();
+  renderForm();
+  updateAll();
+  showToast('ล้างข้อมูลเรียบร้อย');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+function copyScript() {
+  const code = document.getElementById('script-code').textContent;
+  navigator.clipboard.writeText(code).then(() => {
+    showToast('คัดลอกโค้ดเรียบร้อย!');
+  }).catch(() => {
+    showToast('กด Ctrl+A แล้วกด Ctrl+C เพื่อคัดลอก');
+  });
+}
+</script>
+</body>
+</html>
