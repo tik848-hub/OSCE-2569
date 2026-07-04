@@ -285,14 +285,11 @@ a{color:inherit;text-decoration:none}
 <div class="view" id="view-send">
 
   <div class="submit-card">
-    <h3>ส่งผลไป Google Sheets</h3>
-    <p>วางลิงก์ Google Apps Script ที่ได้จากการ Deploy แล้วกดส่ง</p>
+    <h3>ส่งผลการประเมินไป Google Sheets</h3>
+    <p>กดปุ่มด้านล่างเมื่อประเมินครบทุกฐานแล้ว</p>
     <input type="url" class="url-input" id="sheets-url"
-      placeholder="https://script.google.com/macros/s/..."
-      value="">
-    <div style="font-size:11px;opacity:.75;margin-bottom:10px">
-      💡 ตั้งค่าครั้งเดียว ระบบจะจำไว้อัตโนมัติ
-    </div>
+      value="https://script.google.com/macros/s/AKfycbz7E4nZZ8NEzK74dokQuQzPQDwuYul0RRTuaKhB_94mr3nk7tHkC9hzl-QEsY0mOGkn/exec"
+      style="display:none">
     <button class="btn-submit btn-send" id="btn-send" onclick="submitToSheets()">
       ส่งผลการประเมิน
     </button>
@@ -727,11 +724,15 @@ let scores = STATIONS.map(s => {
 });
 let currentStation = 0;
 let currentView = 'assess';
-let sheetsUrl = localStorage.getItem('osce_sheets_url') || '';
+let sheetsUrl = localStorage.getItem('osce_sheets_url') || 'https://script.google.com/macros/s/AKfycbz7E4nZZ8NEzK74dokQuQzPQDwuYul0RRTuaKhB_94mr3nk7tHkC9hzl-QEsY0mOGkn/exec';
 let evaluators = Array(8).fill('');
+let comments   = Array(8).fill('');   // ความคิดเห็นรายฐาน
+let locked     = Array(8).fill(false); // ล็อกฐานหลัง Save
 
 /* ── INIT ───────────────────────────────────────────────────────── */
 window.addEventListener('load', () => {
+  if(!sheetsUrl) sheetsUrl = 'https://script.google.com/macros/s/AKfycbz7E4nZZ8NEzK74dokQuQzPQDwuYul0RRTuaKhB_94mr3nk7tHkC9hzl-QEsY0mOGkn/exec';
+  document.getElementById('sheets-url').value = sheetsUrl;
   document.getElementById('sheets-url').value = sheetsUrl;
   buildStationGrid();
   renderForm();
@@ -778,10 +779,75 @@ function selectStation(idx) {
 
 /* ── FORM ───────────────────────────────────────────────────────── */
 function renderForm() {
-  const s = STATIONS[currentStation];
+  const s    = STATIONS[currentStation];
+  const si   = currentStation;
   const wrap = document.getElementById('station-form');
-  const maxScore = s.max;
+  const maxScore    = s.max;
   const passingScore = Math.ceil(maxScore * 0.7);
+  const isLocked    = locked[si];
+
+  // ── LOCKED view ──────────────────────────────────────────────
+  if (isLocked) {
+    const sc  = stationScore(si);
+    const pct = Math.round(sc / maxScore * 100);
+    const p   = stationPassed(si);
+    const passColor = p ? 'var(--green)' : 'var(--red)';
+    wrap.innerHTML = `
+      <div style="text-align:center;padding:10px 0 6px">
+        <div style="font-size:14px;font-weight:700;color:var(--navy);margin-bottom:4px">${s.name}</div>
+        <div style="display:inline-block;background:${passColor};color:#fff;font-size:13px;font-weight:700;
+          padding:5px 18px;border-radius:20px;margin-bottom:10px">
+          ${p ? '✓ ผ่าน' : '✗ ไม่ผ่าน'} — ${sc}/${maxScore} (${pct}%)
+        </div>
+      </div>
+      <div style="background:#FFF8E1;border:1.5px solid var(--amber);border-radius:8px;
+        padding:12px 14px;font-size:13px;color:var(--amber);text-align:center;margin-bottom:10px">
+        🔒 ฐานนี้บันทึกแล้ว — ไม่สามารถแก้ไขได้อีก
+      </div>
+      <div style="background:var(--ltGray);border-radius:8px;padding:12px 14px;font-size:12px;">
+        <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+          <span style="color:var(--gray)">ผู้ประเมิน</span>
+          <span style="font-weight:700">${evaluators[si] || '—'}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+          <span style="color:var(--gray)">ความคิดเห็น</span>
+          <span style="font-weight:700;color:var(--navy);max-width:60%;text-align:right;line-height:1.4">${comments[si] || '—'}</span>
+        </div>
+        <div style="margin-top:8px;border-top:1px solid var(--border);padding-top:8px">
+          ${STATIONS[si].sections.map(sec =>
+            sec.items.map((item, ii) => {
+              let gi2 = 0;
+              STATIONS[si].sections.forEach((s2, si2) => {
+                s2.items.forEach((_, ii2) => {
+                  if (s2 === sec && ii2 === ii) return;
+                  gi2++;
+                });
+              });
+              return '';
+            }).join('')
+          ).join('')}
+          ${(() => {
+            let gi = 0, rows = '';
+            s.sections.forEach(sec => {
+              sec.items.forEach(item => {
+                const v = scores[si][gi];
+                const col = v===2?'var(--green)':v===1?'var(--amber)':'var(--red)';
+                rows += `<div style="display:flex;justify-content:space-between;
+                  padding:3px 0;border-bottom:1px solid #F0F4F8;font-size:11px">
+                  <span style="color:#333;flex:1">${item.t.substring(0,45)}${item.t.length>45?'…':''}</span>
+                  <span style="font-weight:700;color:${col};min-width:20px;text-align:right">${v!==null?v:'—'}</span>
+                </div>`;
+                gi++;
+              });
+            });
+            return rows;
+          })()}
+        </div>
+      </div>`;
+    return;
+  }
+
+  // ── ACTIVE view ───────────────────────────────────────────────
   let html = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
     <div style="font-size:14px;font-weight:700;color:var(--navy)">${s.name}</div>
     <div style="font-size:11px;color:var(--gray)">เต็ม ${maxScore} | ผ่าน ≥${passingScore}</div>
@@ -792,43 +858,121 @@ function renderForm() {
     html += `<div class="sec-head" style="background:${s.color}">${sec.title}</div>`;
     sec.items.forEach(item => {
       const curGi = gi;
-      const v = scores[currentStation][curGi];
+      const v = scores[si][curGi];
       const critTag = item.crit ? '<span class="crit-tag">★ Critical</span>' : '';
       html += `<div class="item-row">
         <div class="item-text">${item.t}${critTag}</div>
         <div class="score-group">
-          <button class="sb${v===2?' s2':''}" onclick="setScore(${currentStation},${curGi},2)">2</button>
-          <button class="sb${v===1?' s1':''}" onclick="setScore(${currentStation},${curGi},1)">1</button>
-          <button class="sb${v===0?' s0':''}" onclick="setScore(${currentStation},${curGi},0)">0</button>
+          <button class="sb${v===2?' s2':''}" onclick="setScore(${si},${curGi},2)">2</button>
+          <button class="sb${v===1?' s1':''}" onclick="setScore(${si},${curGi},1)">1</button>
+          <button class="sb${v===0?' s0':''}" onclick="setScore(${si},${curGi},0)">0</button>
         </div>
       </div>`;
       gi++;
     });
   });
 
-  const sc = stationScore(currentStation);
-  const pct = Math.round(sc / maxScore * 100);
-  const filled = scores[currentStation].filter(v => v !== null).length;
-  const total = scores[currentStation].length;
-  const evVal = evaluators[currentStation] || '';
-  html += `<div style="margin-top:12px;padding-top:10px;border-top:1px solid #F0F4F8">
-    <label style="font-size:12px;font-weight:700;color:var(--gray);display:block;margin-bottom:4px">ผู้ประเมินฐานนี้</label>
-    <input type="text" id="inp-ev-station"
-      value="${evVal.replace(/"/g,'&quot;')}"
-      placeholder="ชื่อพยาบาลพี่เลี้ยง/ผู้ประเมิน"
-      oninput="evaluators[${currentStation}]=this.value"
-      style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;font-family:'Sarabun',sans-serif;color:#1A1A2E;background:#fff;outline:none">
-  </div>`;
-  html += `<div class="prog-wrap">
-    <div class="prog-label"><span>${sc}/${maxScore} คะแนน (${pct}%)</span><span>${filled}/${total} ข้อ</span></div>
-    <div class="prog-bar"><div class="prog-fill" style="width:${pct}%;background:${pct>=70?'var(--green)':pct>=50?'var(--amber)':'var(--red)'}"></div></div>
+  // ── Evaluator + Comment + Save ─────────────────────────────
+  const evVal  = evaluators[si] || '';
+  const cmtVal = comments[si] || '';
+  const sc2 = stationScore(si);
+  const pct2 = Math.round(sc2 / maxScore * 100);
+  const filled = scores[si].filter(v => v !== null).length;
+  const total  = scores[si].length;
+
+  html += `
+  <div style="margin-top:14px;padding:14px;background:var(--xltBlue);border-radius:8px;
+    border:1.5px solid var(--ltBlue)">
+    <div style="font-size:12px;font-weight:700;color:var(--navy);margin-bottom:10px">
+      บันทึกผลฐานนี้
+    </div>
+
+    <div style="margin-bottom:8px">
+      <label style="font-size:12px;font-weight:700;color:var(--gray);display:block;margin-bottom:4px">
+        ผู้ประเมินฐานนี้ <span style="color:var(--red)">*</span>
+      </label>
+      <input type="text" id="inp-ev-station"
+        value="${evVal.replace(/"/g,'&quot;')}"
+        placeholder="ชื่อพยาบาลพี่เลี้ยง/ผู้ประเมิน"
+        oninput="evaluators[${si}]=this.value"
+        style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:6px;
+          font-size:13px;font-family:'Sarabun',sans-serif;color:#1A1A2E;background:#fff;outline:none">
+    </div>
+
+    <div style="margin-bottom:10px">
+      <label style="font-size:12px;font-weight:700;color:var(--gray);display:block;margin-bottom:4px">
+        ความคิดเห็น/ข้อเสนอแนะเพิ่มเติม
+      </label>
+      <textarea id="inp-comment-station"
+        placeholder="เช่น ผู้รับการประเมินต้องทบทวนเรื่อง Aseptic technique เพิ่มเติม..."
+        oninput="comments[${si}]=this.value"
+        style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:6px;
+          font-size:13px;font-family:'Sarabun',sans-serif;color:#1A1A2E;background:#fff;outline:none;
+          resize:none;height:72px;line-height:1.5">${cmtVal.replace(/</g,'&lt;')}</textarea>
+    </div>
+
+    <div class="prog-wrap" style="margin-bottom:10px">
+      <div class="prog-label">
+        <span>${sc2}/${maxScore} คะแนน (${pct2}%)</span>
+        <span>${filled}/${total} ข้อ</span>
+      </div>
+      <div class="prog-bar">
+        <div class="prog-fill" style="width:${pct2}%;background:${pct2>=70?'var(--green)':pct2>=50?'var(--amber)':'var(--red)'}"></div>
+      </div>
+    </div>
+
+    <button onclick="saveStation(${si})"
+      style="width:100%;padding:12px;border:none;border-radius:8px;
+        background:var(--navy);color:#fff;font-size:14px;font-weight:700;
+        font-family:'Sarabun',sans-serif;cursor:pointer;transition:background .15s"
+      onmouseover="this.style.background='var(--blue)'"
+      onmouseout="this.style.background='var(--navy)'">
+      🔒 บันทึกผลฐานที่ ${si+1} (ล็อกไม่ให้แก้ไข)
+    </button>
+    <div style="font-size:11px;color:var(--amber);text-align:center;margin-top:6px">
+      ⚠ เมื่อบันทึกแล้ว ไม่สามารถแก้ไขผลฐานนี้ได้อีก
+    </div>
   </div>`;
 
   wrap.innerHTML = html;
 }
 
+/* ── SAVE & LOCK STATION ─────────────────────────────────────────── */
+function saveStation(si) {
+  // ตรวจสอบว่ากรอกครบ
+  if (!stationAnswered(si)) {
+    showToast('กรุณากรอกคะแนนให้ครบทุกข้อก่อนบันทึก');
+    return;
+  }
+  // บันทึก evaluator และ comment จาก input ปัจจุบัน
+  const evInp  = document.getElementById('inp-ev-station');
+  const cmtInp = document.getElementById('inp-comment-station');
+  if (evInp)  evaluators[si] = evInp.value.trim();
+  if (cmtInp) comments[si]   = cmtInp.value.trim();
+
+  if (!evaluators[si]) {
+    showToast('กรุณากรอกชื่อผู้ประเมินก่อนบันทึก');
+    document.getElementById('inp-ev-station')?.focus();
+    return;
+  }
+
+  // Confirm ก่อนล็อก
+  if (!confirm(
+    `ยืนยันบันทึกและล็อกฐานที่ ${si+1}: ${STATIONS[si].name}?\n\n` +
+    `คะแนน: ${stationScore(si)}/${STATIONS[si].max}\n` +
+    `ผู้ประเมิน: ${evaluators[si]}\n\n` +
+    `⚠ หลังบันทึกแล้วจะไม่สามารถแก้ไขได้อีก`
+  )) return;
+
+  locked[si] = true;
+  updateAll();
+  renderForm();
+  showToast(`✓ บันทึกฐานที่ ${si+1} เรียบร้อย — ล็อกแล้ว`);
+}
+
 /* ── SCORING ─────────────────────────────────────────────────────── */
 function setScore(stIdx, gi, val) {
+  if (locked[stIdx]) { showToast('ฐานนี้บันทึกแล้ว ไม่สามารถแก้ไขได้'); return; }
   scores[stIdx][gi] = val;
   if (stIdx === currentStation) renderForm();
   updateAll();
@@ -919,14 +1063,15 @@ function updateAll() {
     const sc = stationScore(i);
     const pct2 = Math.round(sc / s.max * 100);
     const p = stationPassed(i);
+    const lockIcon = locked[i] ? '🔒 ' : '';
     const el = document.getElementById('ss-' + i);
     const card = document.getElementById('sc-' + i);
     if (p === true) {
-      el.innerHTML = `<span class="st-badge badge-pass">${pct2}%</span>`;
+      el.innerHTML = `<span class="st-badge badge-pass">${lockIcon}${pct2}%</span>`;
       card.classList.add('done-pass'); card.classList.remove('done-fail','done-critfail');
     } else if (p === false) {
       const critfail = hasCritFail(i);
-      el.innerHTML = `<span class="st-badge badge-fail">${pct2}%</span>`;
+      el.innerHTML = `<span class="st-badge badge-fail">${lockIcon}${pct2}%</span>`;
       card.classList.remove('done-pass');
       if (critfail) { card.classList.add('done-critfail'); card.classList.remove('done-fail'); }
       else { card.classList.add('done-fail'); card.classList.remove('done-critfail'); }
@@ -1157,6 +1302,12 @@ function submitToSheets() {
     showToast('ยังไม่ครบ: ' + unanswered.join(', '));
     return;
   }
+  // ตรวจว่าทุกฐานล็อกแล้ว
+  const unlockedStations = locked.map((l,i)=>l?null:i+1).filter(Boolean);
+  if (unlockedStations.length > 0) {
+    showToast('กรุณากด "บันทึกผล" ให้ครบทุกฐานก่อนส่ง: ฐาน ' + unlockedStations.join(', '));
+    return;
+  }
 
   const btn = document.getElementById('btn-send');
   btn.disabled = true;
@@ -1171,6 +1322,7 @@ function submitToSheets() {
     overallResult: overallResult(),
   });
   evaluators.forEach((e, i) => params.set('ev' + (i+1), e || '—'));
+  comments.forEach((c, i)   => params.set('cm' + (i+1), c || ''));
   STATIONS.forEach((s, i) => {
     params.set('score' + (i+1), stationScore(i));
     params.set('pct' + (i+1), Math.round(stationScore(i) / s.max * 100));
@@ -1215,6 +1367,8 @@ function resetAll() {
     return Array(n).fill(null);
   });
   evaluators = Array(8).fill('');
+  comments   = Array(8).fill('');
+  locked     = Array(8).fill(false);
   document.getElementById('inp-name').value = '';
   document.getElementById('inp-id').value = '';
   document.getElementById('inp-unit').value = '';
