@@ -52,6 +52,12 @@ a{color:inherit;text-decoration:none}
 .form-group input,.form-group select{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:'Sarabun',sans-serif;color:#1A1A2E;background:#fff;outline:none;transition:border-color .15s}
 .form-group input:focus,.form-group select:focus{border-color:var(--blue)}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+/* ── PERIOD BUTTONS ── */
+.period-btn{padding:10px 8px;border:1.5px solid var(--border);border-radius:var(--radius-sm);
+  background:#fff;cursor:pointer;font-family:'Sarabun',sans-serif;color:var(--gray);
+  text-align:center;transition:all .15s;width:100%}
+.period-btn:hover{border-color:var(--blue);color:var(--blue);background:var(--xltBlue)}
+.period-btn.active{background:var(--navy);color:#fff;border-color:var(--navy)}
 
 /* ─── STATION GRID ──────────────────────────────────────────── */
 .station-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:12px 14px 0}
@@ -187,18 +193,56 @@ a{color:inherit;text-decoration:none}
       <label>หน่วยงาน</label>
       <select id="inp-unit">
         <option value="">-- เลือกหน่วยงาน --</option>
-        <option>หอผู้ป่วยวิกฤตเด็ก</option>
-        <option>หอผู้ป่วยวิกฤตทารกแรกเกิด</option>
-        <option>หอผู้ป่วยวิกฤตและโรคหลอดเลือดสมอง</option>
-        <option>หอผู้ป่วยวิกฤตหัวใจ</option>
-        <option>ห้องผ่าตัด</option>
-        <option>ห้องคลอด</option>
-        <option>หอผู้ป่วย 5E</option>
-        <option>หอผู้ป่วย 5D</option>
-        <option>หอผู้ป่วย 5C</option>
-        <option>หอผู้ป่วย 7F</option>
-        <option>งานการพยาบาลผู้ป่วยนอก</option>
+        <optgroup label="งานการพยาบาลผู้ป่วยวิกฤต (ICU)">
+          <option>หอผู้ป่วยวิกฤตทารกแรกเกิด</option>
+          <option>หอผู้ป่วยวิกฤตเด็ก</option>
+          <option>หอผู้ป่วยวิกฤตและโรคหลอดเลือดสมอง</option>
+          <option>หอผู้ป่วยวิกฤตหัวใจ</option>
+        </optgroup>
+        <optgroup label="งานการพยาบาลผู้ป่วยใน (IPD)">
+          <option>หอผู้ป่วย 5E</option>
+          <option>หอผู้ป่วย 5D</option>
+          <option>หอผู้ป่วย 5C</option>
+          <option>หอผู้ป่วย 7F</option>
+        </optgroup>
+        <optgroup label="งานการพยาบาลผู้ป่วยนอก (OPD)">
+          <option>OPD PMR</option>
+          <option>OPD OBG</option>
+          <option>OPD MED</option>
+          <option>OPD NCD</option>
+          <option>OPD EYE</option>
+          <option>OPD OFM</option>
+          <option>OPD SUR</option>
+          <option>OPD SKIN</option>
+        </optgroup>
+        <optgroup label="งานการพยาบาลห้องผ่าตัดและห้องคลอด (OR/LR)">
+          <option>ห้องผ่าตัด</option>
+          <option>ห้องคลอด</option>
+        </optgroup>
       </select>
+    </div>
+    <div class="form-group">
+      <label>ช่วงการประเมิน <span style="color:var(--red)">*</span></label>
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-top:2px">
+        <button type="button" class="period-btn" id="pb-t1" onclick="selectPeriod('T1','1 เดือน — สิ้นสุดโปรแกรม (OSCE)')">
+          <div style="font-size:13px;font-weight:700">T1</div>
+          <div style="font-size:10px;opacity:.85">1 เดือน | สิ้นสุดโปรแกรม</div>
+        </button>
+        <button type="button" class="period-btn" id="pb-t2" onclick="selectPeriod('T2','3 เดือน — ติดตามผลครั้งที่ 1')">
+          <div style="font-size:13px;font-weight:700">T2</div>
+          <div style="font-size:10px;opacity:.85">3 เดือน | ติดตามผลครั้งที่ 1</div>
+        </button>
+        <button type="button" class="period-btn" id="pb-t3" onclick="selectPeriod('T3','6 เดือน — ติดตามผลครั้งที่ 2')">
+          <div style="font-size:13px;font-weight:700">T3</div>
+          <div style="font-size:10px;opacity:.85">6 เดือน | ติดตามผลครั้งที่ 2</div>
+        </button>
+        <button type="button" class="period-btn" id="pb-t0" onclick="selectPeriod('T0','ก่อนเข้าโปรแกรม (Baseline)')">
+          <div style="font-size:13px;font-weight:700">T0</div>
+          <div style="font-size:10px;opacity:.85">Baseline | ก่อนโปรแกรม</div>
+        </button>
+      </div>
+      <input type="hidden" id="inp-period" value="">
+      <div id="period-label" style="margin-top:6px;font-size:12px;color:var(--gray);min-height:16px"></div>
     </div>
   </div>
 
@@ -256,7 +300,7 @@ a{color:inherit;text-decoration:none}
     <div class="radar-wrap"><svg id="radar-svg" viewBox="0 0 320 280"></svg></div>
     <div style="display:flex;gap:12px;justify-content:center;font-size:11px;margin-top:6px">
       <div style="display:flex;align-items:center;gap:4px"><div style="width:14px;height:3px;background:#1A6A40;border-radius:2px"></div>คะแนนที่ได้</div>
-      <div style="display:flex;align-items:center;gap:4px"><div style="width:14px;height:2px;background:#BA7517;border-radius:2px;border-top:1px dashed #BA7517"></div>เกณฑ์ 70%</div>
+      <div style="display:flex;align-items:center;gap:4px"><div style="width:14px;height:2px;background:#BA7517;border-radius:2px;border-top:1px dashed #BA7517"></div>เกณฑ์ 80%</div>
     </div>
   </div>
 
@@ -288,7 +332,7 @@ a{color:inherit;text-decoration:none}
     <h3>ส่งผลการประเมินไป Google Sheets</h3>
     <p>กดปุ่มด้านล่างเมื่อประเมินครบทุกฐานแล้ว</p>
     <input type="url" class="url-input" id="sheets-url"
-      value="https://script.google.com/macros/s/AKfycbz7E4nZZ8NEzK74dokQuQzPQDwuYul0RRTuaKhB_94mr3nk7tHkC9hzl-QEsY0mOGkn/exec"
+      value="https://script.google.com/macros/s/AKfycbyTqd9UgE5wEFVmLgclf9OsUq_3tk38BY3LODpPs6XRHL3vF-vdoh9qWM1GfoZSzOog/exec"
       style="display:none">
     <button class="btn-submit btn-send" id="btn-send" onclick="submitToSheets()">
       ส่งผลการประเมิน
@@ -299,148 +343,6 @@ a{color:inherit;text-decoration:none}
     <div id="send-status"></div>
   </div>
 
-  <!-- Apps Script Setup Guide -->
-  <div class="card">
-    <div class="card-title">วิธีตั้งค่า Google Apps Script (ทำครั้งแรกครั้งเดียว)</div>
-
-    <div style="counter-reset:step-counter">
-
-      <div style="display:flex;gap:10px;margin-bottom:12px">
-        <div style="width:24px;height:24px;background:var(--navy);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">1</div>
-        <div>
-          <div style="font-size:13px;font-weight:700;margin-bottom:3px">สร้าง Google Sheet</div>
-          <div style="font-size:12px;color:var(--gray);line-height:1.6">ไปที่ sheets.google.com → สร้างไฟล์ใหม่ → ตั้งชื่อ "OSCE ผลประเมิน 2569" → เปลี่ยนชื่อ Sheet1 เป็น "ผลประเมิน"</div>
-        </div>
-      </div>
-
-      <div style="display:flex;gap:10px;margin-bottom:12px">
-        <div style="width:24px;height:24px;background:var(--navy);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">2</div>
-        <div>
-          <div style="font-size:13px;font-weight:700;margin-bottom:3px">เปิด Apps Script</div>
-          <div style="font-size:12px;color:var(--gray);line-height:1.6">ใน Google Sheet กด Extensions → Apps Script → ลบโค้ดเดิมออก → วางโค้ดด้านล่าง:</div>
-          <div style="background:#1A1A2E;border-radius:6px;padding:10px;margin-top:6px;font-family:monospace;font-size:10px;color:#B5D4F4;line-height:1.7;overflow-x:auto;white-space:pre" id="script-code">// ── วางโค้ดนี้ทั้งหมดใน Apps Script แทนโค้ดเดิม ──
-var SHEET_ID = ""; // ← วาง Spreadsheet ID ของคุณที่นี่
-
-function doGet(e) {
-  try {
-    var ss = SHEET_ID
-      ? SpreadsheetApp.openById(SHEET_ID)
-      : SpreadsheetApp.getActiveSpreadsheet();
-
-    var sheet = ss.getSheets()[0]; // ใช้ Sheet แรกเสมอ
-
-    // สร้าง header ถ้ายังไม่มี
-    if (sheet.getLastRow() === 0) {
-      sheet.appendRow([
-        "Timestamp","ชื่อ-สกุล","รหัสบุคลากร","หน่วยงาน",
-        "ผู้ประเมินฐาน1","ผู้ประเมินฐาน2","ผู้ประเมินฐาน3","ผู้ประเมินฐาน4",
-        "ผู้ประเมินฐาน5","ผู้ประเมินฐาน6","ผู้ประเมินฐาน7","ผู้ประเมินฐาน8",
-        "ฐาน1_Sterile","ฐาน2_Suction","ฐาน3_Injection","ฐาน4_BloodTx",
-        "ฐาน5_IVFluid","ฐาน6_PIVCann","ฐาน7_Venipuncture","ฐาน8_NGT",
-        "%ฐาน1","%ฐาน2","%ฐาน3","%ฐาน4",
-        "%ฐาน5","%ฐาน6","%ฐาน7","%ฐาน8",
-        "ผลฐาน1","ผลฐาน2","ผลฐาน3","ผลฐาน4",
-        "ผลฐาน5","ผลฐาน6","ผลฐาน7","ผลฐาน8",
-        "คะแนนรวม","%รวม","CriticalFail","ผลสรุป"
-      ]);
-      sheet.getRange(1,1,1,40)
-        .setBackground("#1A3A5C")
-        .setFontColor("#FFFFFF")
-        .setFontWeight("bold");
-    }
-
-    var p = e.parameter;
-    sheet.appendRow([
-      new Date(),
-      p.name||"", p.id||"", p.unit||"",
-      p.ev1||"", p.ev2||"", p.ev3||"", p.ev4||"",
-      p.ev5||"", p.ev6||"", p.ev7||"", p.ev8||"",
-      p.score1||"", p.score2||"", p.score3||"", p.score4||"",
-      p.score5||"", p.score6||"", p.score7||"", p.score8||"",
-      p.pct1||"", p.pct2||"", p.pct3||"", p.pct4||"",
-      p.pct5||"", p.pct6||"", p.pct7||"", p.pct8||"",
-      p.result1||"", p.result2||"", p.result3||"", p.result4||"",
-      p.result5||"", p.result6||"", p.result7||"", p.result8||"",
-      p.totalScore||"", p.totalPct||"",
-      p.critFails||"", p.overallResult||""
-    ]);
-
-    // ไฮไลต์ผลสรุป
-    var lastRow = sheet.getLastRow();
-    var cell = sheet.getRange(lastRow, 40);
-    if ((p.overallResult||"") === "ผ่านทุกฐาน") {
-      cell.setBackground("#D6EFE1").setFontColor("#1A6A40");
-    } else {
-      cell.setBackground("#F5D6D6").setFontColor("#8A1A1A");
-    }
-
-    // คืนค่า 1×1 pixel GIF โปร่งใส
-    // เพื่อให้ Image tag ใน browser โหลดได้สำเร็จ
-    var gif = "R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
-    var blob = Utilities.newBlob(
-      Utilities.base64Decode(gif), "image/gif", "p.gif");
-    return ContentService
-      .createTextOutput("")
-      .setMimeType(ContentService.MimeType.TEXT);
-
-  } catch(err) {
-    Logger.log("ERROR: " + err);
-    return ContentService
-      .createTextOutput("error")
-      .setMimeType(ContentService.MimeType.TEXT);
-  }
-}
-
-// ── ทดสอบ: กด Run เลือก testWrite ──
-function testWrite() {
-  var ss = SHEET_ID
-    ? SpreadsheetApp.openById(SHEET_ID)
-    : SpreadsheetApp.getActiveSpreadsheet();
-  var sheet = ss.getSheets()[0];
-  sheet.appendRow(["TEST", new Date(), "ทดสอบ"]);
-  Logger.log("OK — Sheet: " + sheet.getName()
-    + " | แถวที่: " + sheet.getLastRow());
-}</div>
-          <button onclick="copyScript()" style="margin-top:6px;padding:6px 14px;background:var(--ltBlue);color:var(--navy);border:1px solid var(--mid);border-radius:6px;font-size:12px;cursor:pointer;font-family:'Sarabun',sans-serif;font-weight:600">คัดลอกโค้ด</button>
-        </div>
-      </div>
-
-      <div style="display:flex;gap:10px;margin-bottom:12px">
-        <div style="width:24px;height:24px;background:var(--navy);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">3</div>
-        <div>
-          <div style="font-size:13px;font-weight:700;margin-bottom:3px">Deploy เป็น Web App</div>
-          <div style="font-size:12px;color:var(--gray);line-height:1.6">กด <strong>Deploy</strong> → <strong>New deployment</strong> → เลือก type: <strong>Web App</strong><br>
-          Execute as: <strong>Me</strong><br>
-          Who has access: <strong>Anyone</strong><br>
-          กด <strong>Deploy</strong> → Copy URL → วางในช่องด้านบน</div>
-        </div>
-      </div>
-
-      <div style="display:flex;gap:10px">
-        <div style="width:24px;height:24px;background:var(--green);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">✓</div>
-        <div>
-          <div style="font-size:13px;font-weight:700;margin-bottom:3px">พร้อมใช้งาน</div>
-          <div style="font-size:12px;color:var(--gray);line-height:1.6">กรอกคะแนนครบ 8 ฐาน → มาที่แท็บ "ส่งผล" → กดส่ง → ข้อมูลเข้า Google Sheets อัตโนมัติ ข้อมูลจะถูกจัดเก็บพร้อม Timestamp ทันที</div>
-        </div>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- Looker Studio tip -->
-  <div class="card" style="border-left:4px solid var(--amber)">
-    <div class="card-title" style="color:var(--amber)">
-      <svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:var(--amber);fill:none;stroke-width:2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
-      ต่อยอด: สร้าง Dashboard ด้วย Looker Studio
-    </div>
-    <div style="font-size:12px;color:var(--gray);line-height:1.7">
-      1. ไปที่ <strong>lookerstudio.google.com</strong> → Create → Report<br>
-      2. เลือก Data Source: Google Sheets → เลือกไฟล์ OSCE<br>
-      3. เพิ่ม Chart: Bar chart (คะแนนรายฐาน), Scorecard (% ผ่าน), Table (รายชื่อไม่ผ่าน)<br>
-      4. เพิ่ม Filter: หน่วยงาน, วันที่<br>
-      5. Share link ให้หัวหน้าฝ่ายดู Realtime ได้ทันที
-    </div>
-  </div>
 
 </div><!-- /view-send -->
 
@@ -724,14 +626,14 @@ let scores = STATIONS.map(s => {
 });
 let currentStation = 0;
 let currentView = 'assess';
-let sheetsUrl = localStorage.getItem('osce_sheets_url') || 'https://script.google.com/macros/s/AKfycbz7E4nZZ8NEzK74dokQuQzPQDwuYul0RRTuaKhB_94mr3nk7tHkC9hzl-QEsY0mOGkn/exec';
+let sheetsUrl = localStorage.getItem('osce_sheets_url') || 'https://script.google.com/macros/s/AKfycbyTqd9UgE5wEFVmLgclf9OsUq_3tk38BY3LODpPs6XRHL3vF-vdoh9qWM1GfoZSzOog/exec';
 let evaluators = Array(8).fill('');
 let comments   = Array(8).fill('');   // ความคิดเห็นรายฐาน
 let locked     = Array(8).fill(false); // ล็อกฐานหลัง Save
 
 /* ── INIT ───────────────────────────────────────────────────────── */
 window.addEventListener('load', () => {
-  if(!sheetsUrl) sheetsUrl = 'https://script.google.com/macros/s/AKfycbz7E4nZZ8NEzK74dokQuQzPQDwuYul0RRTuaKhB_94mr3nk7tHkC9hzl-QEsY0mOGkn/exec';
+  if(!sheetsUrl) sheetsUrl = 'https://script.google.com/macros/s/AKfycbyTqd9UgE5wEFVmLgclf9OsUq_3tk38BY3LODpPs6XRHL3vF-vdoh9qWM1GfoZSzOog/exec';
   document.getElementById('sheets-url').value = sheetsUrl;
   document.getElementById('sheets-url').value = sheetsUrl;
   buildStationGrid();
@@ -777,13 +679,29 @@ function selectStation(idx) {
   renderForm();
 }
 
-/* ── FORM ───────────────────────────────────────────────────────── */
+/* ── PERIOD SELECTION ──────────────────────────────────────────── */
+function selectPeriod(code, label) {
+  document.getElementById('inp-period').value = code;
+  document.getElementById('period-label').innerHTML =
+    `<span style="background:var(--xltBlue);color:var(--navy);padding:2px 10px;
+      border-radius:10px;font-weight:700;font-size:12px">✓ ${code}: ${label}</span>`;
+  // อัปเดตปุ่ม
+  ['t0','t1','t2','t3'].forEach(t => {
+    const btn = document.getElementById('pb-'+t);
+    if (btn) btn.classList.toggle('active', 'pb-'+t === 'pb-'+code.toLowerCase());
+  });
+  // อัปเดต title ของ Top bar ให้แสดงช่วง
+  const h1 = document.querySelector('.top-bar h1');
+  if (h1) h1.textContent = `OSCE ประเมินสมรรถนะ — ${code} (${label.split('—')[0].trim()})`;
+}
+
+
 function renderForm() {
   const s    = STATIONS[currentStation];
   const si   = currentStation;
   const wrap = document.getElementById('station-form');
   const maxScore    = s.max;
-  const passingScore = Math.ceil(maxScore * 0.7);
+  const passingScore = Math.ceil(maxScore * 0.8);
   const isLocked    = locked[si];
 
   // ── LOCKED view ──────────────────────────────────────────────
@@ -917,7 +835,7 @@ function renderForm() {
         <span>${filled}/${total} ข้อ</span>
       </div>
       <div class="prog-bar">
-        <div class="prog-fill" style="width:${pct2}%;background:${pct2>=70?'var(--green)':pct2>=50?'var(--amber)':'var(--red)'}"></div>
+        <div class="prog-fill" style="width:${pct2}%;background:${pct2>=80?'var(--green)':pct2>=65?'var(--amber)':'var(--red)'}"></div>
       </div>
     </div>
 
@@ -939,11 +857,12 @@ function renderForm() {
 
 /* ── SAVE & LOCK STATION ─────────────────────────────────────────── */
 function saveStation(si) {
-  // ตรวจสอบว่ากรอกครบ
+  // ตรวจสอบว่ากรอกครบทุกข้อ
   if (!stationAnswered(si)) {
     showToast('กรุณากรอกคะแนนให้ครบทุกข้อก่อนบันทึก');
     return;
   }
+
   // บันทึก evaluator และ comment จาก input ปัจจุบัน
   const evInp  = document.getElementById('inp-ev-station');
   const cmtInp = document.getElementById('inp-comment-station');
@@ -956,18 +875,62 @@ function saveStation(si) {
     return;
   }
 
+  // ดึงข้อมูลผู้รับการประเมิน
+  const name = document.getElementById('inp-name').value.trim();
+  const id   = document.getElementById('inp-id').value.trim();
+  const unit = document.getElementById('inp-unit').value;
+
+  if (!name || !id) {
+    showToast('กรุณากรอกชื่อและรหัสผู้รับการประเมินก่อน');
+    return;
+  }
+
   // Confirm ก่อนล็อก
   if (!confirm(
     `ยืนยันบันทึกและล็อกฐานที่ ${si+1}: ${STATIONS[si].name}?\n\n` +
+    `ผู้รับการประเมิน: ${name}\n` +
     `คะแนน: ${stationScore(si)}/${STATIONS[si].max}\n` +
     `ผู้ประเมิน: ${evaluators[si]}\n\n` +
     `⚠ หลังบันทึกแล้วจะไม่สามารถแก้ไขได้อีก`
   )) return;
 
+  // ล็อกฐาน
   locked[si] = true;
   updateAll();
   renderForm();
-  showToast(`✓ บันทึกฐานที่ ${si+1} เรียบร้อย — ล็อกแล้ว`);
+
+  // ── ส่งข้อมูลฐานนี้ไป Google Sheets ทันที ──────────────────────
+  const url = sheetsUrl;
+  if (!url) { showToast(`✓ บันทึกฐาน ${si+1} แล้ว (ไม่มี URL — ข้ามการส่ง)`); return; }
+
+  const sc  = stationScore(si);
+  const pct = Math.round(sc / STATIONS[si].max * 100);
+  const p   = stationPassed(si);
+
+  const params = new URLSearchParams({
+    type:       'station',          // บอก Apps Script ว่าเป็นข้อมูลรายฐาน
+    name, id, unit,
+    period:     document.getElementById('inp-period').value || 'ไม่ระบุ',
+    station:    si + 1,
+    stationName: STATIONS[si].name,
+    evaluator:  evaluators[si],
+    comment:    comments[si] || '',
+    score:      sc,
+    maxScore:   STATIONS[si].max,
+    pct,
+    result:     p === true ? 'ผ่าน' : p === false ? 'ไม่ผ่าน' : 'ไม่ครบ',
+    critFail:   hasCritFail(si) ? 'มี' : 'ไม่มี',
+    timestamp:  new Date().toLocaleString('th-TH'),
+    // ส่งคะแนนรายข้อด้วย (items)
+    itemScores: scores[si].join(','),
+  });
+
+  // Image tag method — bypass CORS 100%
+  const img = new Image();
+  img.onload = img.onerror = () => {
+    showToast(`✓ บันทึกฐาน ${si+1} และส่ง Google Sheets แล้ว`);
+  };
+  img.src = url + '?' + params.toString();
 }
 
 /* ── SCORING ─────────────────────────────────────────────────────── */
@@ -1000,7 +963,7 @@ function hasCritFail(i) {
 function stationPassed(i) {
   if (!stationAnswered(i)) return null;
   if (hasCritFail(i)) return false;
-  return stationScore(i) >= Math.ceil(STATIONS[i].max * 0.7);
+  return stationScore(i) >= Math.ceil(STATIONS[i].max * 0.8);
 }
 
 function getCritFails() {
@@ -1029,7 +992,19 @@ function totalPct() {
 }
 
 function overallResult() {
+  const period  = document.getElementById('inp-period')?.value || '';
   const passCount = STATIONS.filter((_, i) => stationPassed(i) === true).length;
+  const lockedCount = locked.filter(Boolean).length;
+  const isFollowUp = period === 'T2' || period === 'T3';
+
+  if (isFollowUp) {
+    if (lockedCount === 0) return 'ยังไม่ประเมิน';
+    const failCount = locked.filter((l,i) => l && stationPassed(i) === false).length;
+    return failCount > 0
+      ? `${period}: สอบซ้ำ ${failCount} ฐาน (${lockedCount}/8 ฐาน)`
+      : `${period}: ผ่านทุกฐานที่ประเมิน (${lockedCount}/8 ฐาน)`;
+  }
+
   const allDone = STATIONS.every((_, i) => stationAnswered(i));
   if (!allDone) return 'ยังไม่ครบ';
   return passCount === 8 ? 'ผ่านทุกฐาน' : `ต้องสอบซ้ำ ${8-passCount} ฐาน`;
@@ -1045,7 +1020,7 @@ function updateAll() {
   document.getElementById('lbl-pct').textContent = pct + '%';
   const bar = document.getElementById('bar-total');
   bar.style.width = pct + '%';
-  bar.style.background = pct >= 70 ? 'var(--green)' : pct >= 50 ? 'var(--amber)' : 'var(--red)';
+  bar.style.background = pct >=80 ? 'var(--green)' : pct >= 50 ? 'var(--amber)' : 'var(--red)';
 
   const passCount = STATIONS.filter((_, i) => stationPassed(i) === true).length;
   const allDone = STATIONS.every((_, i) => stationAnswered(i));
@@ -1097,7 +1072,7 @@ function renderSummary() {
   document.getElementById('s-unit').textContent = unit;
   document.getElementById('s-total').textContent = `${total}/${max}`;
   document.getElementById('s-pct').textContent = pct + '%';
-  document.getElementById('s-pct').style.color = pct >= 70 ? 'var(--green)' : pct >= 50 ? 'var(--amber)' : 'var(--red)';
+  document.getElementById('s-pct').style.color = pct >=80 ? 'var(--green)' : pct >= 50 ? 'var(--amber)' : 'var(--red)';
   document.getElementById('s-pass-count').textContent = `ผ่าน ${passCount}/8 ฐาน`;
 
   const res = document.getElementById('s-result');
@@ -1112,7 +1087,7 @@ function renderSummary() {
     const sc = stationScore(i);
     const pct2 = Math.round(sc / s.max * 100);
     const p = stationPassed(i);
-    const color = pct2 >= 70 ? '#1A6A40' : pct2 >= 50 ? '#BA7517' : '#8A1A1A';
+    const color = pct2 >=80 ? '#1A6A40' : pct2 >= 50 ? '#BA7517' : '#8A1A1A';
     const tag = p===true ? `<span class="pass-tag" style="background:#D6EFE1;color:#1A6A40">ผ่าน</span>` :
                 p===false ? `<span class="pass-tag" style="background:#F5D6D6;color:#8A1A1A">ไม่ผ่าน</span>` :
                 `<span class="pass-tag" style="background:#F0F4F8;color:#555">—</span>`;
@@ -1189,7 +1164,7 @@ function drawRadar() {
   let p70 = '';
   for (let i = 0; i < N; i++) {
     const a = (i/N)*Math.PI*2 - Math.PI/2;
-    p70 += (i===0?'M':'L')+(cx+r*0.7*Math.cos(a)).toFixed(1)+','+(cy+r*0.7*Math.sin(a)).toFixed(1);
+    p70 += (i===0?'M':'L')+(cx+r*0.8*Math.cos(a)).toFixed(1)+','+(cy+r*0.8*Math.sin(a)).toFixed(1);
   }
   const poly70 = document.createElementNS('http://www.w3.org/2000/svg','path');
   poly70.setAttribute('d',p70+'Z'); poly70.setAttribute('fill','none');
@@ -1227,14 +1202,14 @@ function renderDevelop() {
   const weak=[], med=[], str=[];
   STATIONS.forEach((s, i) => {
     const pct = Math.round(stationScore(i)/s.max*100);
-    if (pct < 70) weak.push({i, pct, s});
+    if (pct <80) weak.push({i, pct, s});
     else if (pct < 85) med.push({i, pct, s});
     else str.push({i, pct, s});
   });
 
   let html = '';
   if (weak.length) {
-    html += `<div style="font-size:12px;font-weight:700;color:var(--red);margin-bottom:8px">ต้องพัฒนาด่วน (< 70%)</div>`;
+    html += `<div style="font-size:12px;font-weight:700;color:var(--red);margin-bottom:8px">ต้องพัฒนาด่วน (< 80%)</div>`;
     weak.forEach(({i,pct,s}) => {
       html += `<div class="dev-item d-fail">
         <div class="dev-title" style="color:var(--red)">ฐาน${i+1}: ${s.name} — ${pct}%</div>
@@ -1243,7 +1218,7 @@ function renderDevelop() {
     });
   }
   if (med.length) {
-    html += `<div style="font-size:12px;font-weight:700;color:var(--amber);margin:12px 0 8px">ควรเสริมสร้าง (70–84%)</div>`;
+    html += `<div style="font-size:12px;font-weight:700;color:var(--amber);margin:12px 0 8px">ควรเสริมสร้าง (80–89%)</div>`;
     med.forEach(({i,pct,s}) => {
       html += `<div class="dev-item d-warn">
         <div class="dev-title" style="color:var(--amber)">ฐาน${i+1}: ${s.name} — ${pct}%</div>
@@ -1252,7 +1227,7 @@ function renderDevelop() {
     });
   }
   if (str.length) {
-    html += `<div style="font-size:12px;font-weight:700;color:var(--green);margin:12px 0 8px">จุดแข็ง (≥ 85%)</div>`;
+    html += `<div style="font-size:12px;font-weight:700;color:var(--green);margin:12px 0 8px">จุดแข็ง (≥ 90%)</div>`;
     str.forEach(({i,pct,s}) => {
       html += `<div class="dev-item d-pass">
         <div class="dev-title" style="color:var(--green)">ฐาน${i+1}: ${s.name} — ${pct}%</div>
@@ -1273,7 +1248,7 @@ function renderDevelop() {
   let ghtml = '';
   groups.forEach(({label,sts,color,tip}) => {
     const avg = Math.round(sts.reduce((a,i)=>a+Math.round(stationScore(i)/STATIONS[i].max*100),0)/sts.length);
-    const tc = avg>=70?'var(--green)':avg>=50?'var(--amber)':'var(--red)';
+    const tc = avg>=80?'var(--green)':avg>=65?'var(--amber)':'var(--red)';
     ghtml += `<div style="border-left:3px solid ${color};padding:10px 12px;margin-bottom:8px;background:#F8F9FC;border-radius:0 6px 6px 0">
       <div style="display:flex;justify-content:space-between;margin-bottom:4px">
         <div style="font-size:13px;font-weight:700">${label}</div>
@@ -1287,26 +1262,55 @@ function renderDevelop() {
 
 /* ── SUBMIT TO SHEETS ────────────────────────────────────────────── */
 function submitToSheets() {
-  const url = document.getElementById('sheets-url').value.trim();
-  const name = document.getElementById('inp-name').value.trim();
-  const id = document.getElementById('inp-id').value.trim();
-  const unit = document.getElementById('inp-unit').value;
+  const url    = document.getElementById('sheets-url').value.trim();
+  const name   = document.getElementById('inp-name').value.trim();
+  const id     = document.getElementById('inp-id').value.trim();
+  const unit   = document.getElementById('inp-unit').value;
+  const period = document.getElementById('inp-period').value;
 
-  if (!url) { showToast('กรุณาใส่ URL ของ Google Apps Script'); return; }
-  if (!name) { showToast('กรุณากรอกชื่อ-สกุลผู้รับการประเมิน'); return; }
-  if (!id) { showToast('กรุณากรอกรหัสบุคลากร'); return; }
+  if (!url)    { showToast('กรุณาใส่ URL ของ Google Apps Script'); return; }
+  if (!name)   { showToast('กรุณากรอกชื่อ-สกุลผู้รับการประเมิน'); return; }
+  if (!id)     { showToast('กรุณากรอกรหัสบุคลากร'); return; }
+  if (!period) { showToast('กรุณาเลือกช่วงการประเมิน (T0/T1/T2/T3) ก่อนส่ง'); return; }
 
-  const allDone = STATIONS.every((_, i) => stationAnswered(i));
-  if (!allDone) {
-    const unanswered = STATIONS.filter((_, i) => !stationAnswered(i)).map((_, i) => `ฐาน${i+1}`);
-    showToast('ยังไม่ครบ: ' + unanswered.join(', '));
-    return;
-  }
-  // ตรวจว่าทุกฐานล็อกแล้ว
-  const unlockedStations = locked.map((l,i)=>l?null:i+1).filter(Boolean);
-  if (unlockedStations.length > 0) {
-    showToast('กรุณากด "บันทึกผล" ให้ครบทุกฐานก่อนส่ง: ฐาน ' + unlockedStations.join(', '));
-    return;
+  const isFollowUp = period === 'T2' || period === 'T3'; // ติดตามผล — ไม่ต้องครบ 8 ฐาน
+  const answeredCount = STATIONS.filter((_, i) => stationAnswered(i)).length;
+  const lockedCount   = locked.filter(Boolean).length;
+
+  if (isFollowUp) {
+    // T2/T3: ต้องมีอย่างน้อย 1 ฐานที่ล็อกแล้ว
+    if (lockedCount === 0) {
+      showToast('T2/T3: กรุณาประเมินและบันทึกอย่างน้อย 1 ฐาน');
+      return;
+    }
+    // แจ้งให้รู้ว่าส่งแบบบางฐาน
+    const answeredNames = STATIONS
+      .map((_, i) => locked[i] ? `ฐาน${i+1} ${STATIONS[i].short||''}` : null)
+      .filter(Boolean);
+    if (!confirm(
+      `ยืนยันส่งผล ${period} (ติดตามผล)\n\n` +
+      `ฐานที่บันทึกแล้ว: ${answeredNames.join(', ')}\n` +
+      `ฐานที่ไม่ได้ประเมิน: ${8 - lockedCount} ฐาน\n\n` +
+      `ต้องการส่งผลเฉพาะฐานที่บันทึกแล้วใช่หรือไม่?`
+    )) return;
+  } else {
+    // T0/T1: ต้องครบ 8 ฐาน
+    const allDone = STATIONS.every((_, i) => stationAnswered(i));
+    if (!allDone) {
+      const unanswered = STATIONS
+        .filter((_, i) => !stationAnswered(i))
+        .map((_, i) => `ฐาน${i+1} ${ST_SHORT[i]}`);
+      showToast('T0/T1 ต้องประเมินครบ 8 ฐาน — ยังขาด: ' + unanswered.join(', '));
+      return;
+    }
+    // ตรวจว่าทุกฐานล็อกแล้ว
+    const unlockedStations = locked
+      .map((l,i) => l ? null : `ฐาน${i+1} ${ST_SHORT[i]}`)
+      .filter(Boolean);
+    if (unlockedStations.length > 0) {
+      showToast('กรุณากด "บันทึกผล" ให้ครบก่อนส่ง: ' + unlockedStations.join(', '));
+      return;
+    }
   }
 
   const btn = document.getElementById('btn-send');
@@ -1316,6 +1320,7 @@ function submitToSheets() {
   // สร้าง URL พร้อม parameters
   const params = new URLSearchParams({
     name, id, unit,
+    period: document.getElementById('inp-period').value || 'ไม่ระบุ',
     totalScore: totalScore(),
     totalPct: totalPct(),
     critFails: getCritFails(),
@@ -1346,10 +1351,8 @@ function submitToSheets() {
         font-size:13px;font-weight:700;margin-top:8px;text-align:center">
         ✓ ส่งข้อมูลเรียบร้อย<br>
         <span style="font-size:11px;font-weight:400">
-          ${name} | ${unit} | ${new Date().toLocaleString('th-TH')}
-        </span><br>
-        <span style="font-size:11px;font-weight:400;color:#555">
-          กรุณาตรวจสอบว่าข้อมูลเข้า Google Sheets แล้ว
+          ${name} | ${unit}<br>
+          ช่วงประเมิน: ${period} | ${new Date().toLocaleString('th-TH')}
         </span>
       </div>`;
   };
@@ -1369,9 +1372,19 @@ function resetAll() {
   evaluators = Array(8).fill('');
   comments   = Array(8).fill('');
   locked     = Array(8).fill(false);
+  // Reset period
+  document.getElementById('inp-period').value = '';
+  document.getElementById('period-label').innerHTML = '';
+  ['t0','t1','t2','t3'].forEach(t => {
+    const btn = document.getElementById('pb-'+t);
+    if(btn) btn.classList.remove('active');
+  });
+  const h1 = document.querySelector('.top-bar h1');
+  if(h1) h1.textContent = 'OSCE ประเมินสมรรถนะพยาบาลใหม่';
   document.getElementById('inp-name').value = '';
   document.getElementById('inp-id').value = '';
   document.getElementById('inp-unit').value = '';
+  document.getElementById('inp-period').value = '';
   buildStationGrid();
   renderForm();
   updateAll();
@@ -1385,14 +1398,7 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 3000);
 }
 
-function copyScript() {
-  const code = document.getElementById('script-code').textContent;
-  navigator.clipboard.writeText(code).then(() => {
-    showToast('คัดลอกโค้ดเรียบร้อย!');
-  }).catch(() => {
-    showToast('กด Ctrl+A แล้วกด Ctrl+C เพื่อคัดลอก');
-  });
-}
+function copyScript() {}
 </script>
 </body>
 </html>
